@@ -25,7 +25,7 @@ $role = 'user';
 $query = "INSERT INTO user (email, nik, password, nama, no_hp, alamat, role)
 VALUES ('$email', '$nik', '$password_hash', '$nama', '$no_hp', '$alamat', '$role')";
 
-mysqli_query($conn, $query);
+mysqli_query($koneksi, $query);
 
 echo "<script>alert('Registrasi berhasil'); window.location='login.php';</script>";
 ?>
