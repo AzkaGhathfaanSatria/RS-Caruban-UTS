@@ -7,11 +7,11 @@ if (!isset($_SESSION['login']) || $_SESSION['role'] != 'admin') {
     exit;
 }
 
-$total_user = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM user"));
-$total_admin = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM user WHERE role='admin'"));
-$total_user_biasa = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM user WHERE role='user'"));
+$total_user = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user"));
+$total_admin = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE role='admin'"));
+$total_user_biasa = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE role='user'"));
 
-$data_user = mysqli_query($conn, "SELECT * FROM user");
+$data_user = mysqli_query($koneksi, "SELECT * FROM user");
 ?>
 
 <!DOCTYPE html>
