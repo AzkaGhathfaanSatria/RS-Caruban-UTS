@@ -6,7 +6,7 @@ $email = $_POST['email'];
 $nik = $_POST['nik'];
 $password = $_POST['password'];
 
-$query = mysqli_query($conn, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
+$query = mysqli_query($koneksi, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
 $data = mysqli_fetch_assoc($query);
 
 if ($data) {
