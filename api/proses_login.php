@@ -1,26 +1,34 @@
 <?php
-session_set_cookie_params(0, '/');
 session_start();
-require_once 'koneksi.php';
+include 'koneksi.php';
 
-$email = mysqli_real_escape_string($koneksi, $_POST['email'] ?? '');
-$nik   = mysqli_real_escape_string($koneksi, $_POST['nik'] ?? '');
-$pass  = $_POST['password'] ?? '';
+$email = $_POST['email'];
+$nik = $_POST['nik'];
+$password = $_POST['password'];
 
-$sql = "SELECT * FROM user WHERE email='$email' AND nik='$nik' LIMIT 1";
-$query = mysqli_query($koneksi, $sql);
+$query = mysqli_query($conn, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
 $data = mysqli_fetch_assoc($query);
 
-if ($data && password_verify($pass, $data['password'])) {
-    $_SESSION['login'] = true;
-    $_SESSION['email'] = $data['email'];
-    $_SESSION['role']  = strtolower(trim($data['role']));
-    session_write_close();
+if ($data) {
 
-    $target = ($_SESSION['role'] === 'admin') ? 'admin_dashboard' : 'dashboard';
-    echo "<script>window.location.replace('/api/$target');</script>";
-    exit;
+    if (password_verify($password, $data['password'])) {
+
+        $_SESSION['login'] = true;
+        $_SESSION['role'] = $data['role'];
+        $_SESSION['email'] = $data['email'];
+
+        if ($data['role'] == 'admin') {
+            header("Location: admin_dashboard.php");
+        } else {
+            header("Location: dashboard.php");
+        }
+        exit;
+
+    } else {
+        echo "<script>alert('Password salah'); window.location='login.php';</script>";
+    }
+
 } else {
-    echo "<script>alert('Login Gagal!'); window.location.replace('/login.php?error=1');</script>";
-    exit;
+    echo "<script>alert('User tidak ditemukan'); window.location='login.php';</script>";
 }
+?>
