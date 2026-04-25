@@ -15,15 +15,12 @@ if ($data && password_verify($pass, $data['password'])) {
     $_SESSION['login'] = true;
     $_SESSION['email'] = $data['email'];
     $_SESSION['role']  = strtolower(trim($data['role']));
+    session_write_close();
 
-    session_write_close(); // Kunci session sebelum pindah
-
-    $target = ($_SESSION['role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
-    
-    // Pindah halaman pakai JS (Lebih aman di Vercel)
-    echo "<script>window.location.replace('$target');</script>";
+    $target = ($_SESSION['role'] === 'admin') ? 'admin_dashboard' : 'dashboard';
+    echo "<script>window.location.replace('/api/$target');</script>";
     exit;
 } else {
-    echo "<script>alert('Login Gagal! Data tidak cocok.'); window.location.replace('../login.php?error=1');</script>";
+    echo "<script>alert('Login Gagal!'); window.location.replace('/login.php?error=1');</script>";
     exit;
 }

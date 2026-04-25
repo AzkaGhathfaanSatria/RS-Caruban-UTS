@@ -12,5 +12,5 @@ mysqli_ssl_set($koneksi, NULL, NULL, NULL, NULL, NULL);
 $real_connect = @mysqli_real_connect($koneksi, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$real_connect) {
-    die("Koneksi Database Gagal");
+    die("Database Offline");
 }
