@@ -1,12 +1,21 @@
 <?php
 session_start();
 
-<?php
-session_start();
-
 // Debugging: Jika masih mental, aktifkan baris di bawah untuk melihat isi session sebenarnya
 // die(print_r($_SESSION, true)); 
 
+if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
+    header("Location: /index.html");
+    exit;
+}
+
+// Gunakan strtolower lagi di sini sebagai pengaman ganda
+$current_role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
+
+if ($current_role !== 'user') {
+    header("Location: /index.html");
+    exit;
+}
 
 // ... sisa kode BPS dan HTML ...
 
