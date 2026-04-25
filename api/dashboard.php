@@ -1,7 +1,4 @@
 <?php
-session_start();
-
-<?php
 // PAKSA TAMPILKAN ERROR
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -50,7 +47,6 @@ if ($response !== FALSE) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
