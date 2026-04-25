@@ -1,38 +1,39 @@
 <?php
-// 1. Tambahkan pengaman cookie path agar session terbaca di semua folder
-session_set_cookie_params(0, '/'); 
 session_start();
-
+// File koneksi harus ada di dalam folder api juga
 include 'koneksi.php';
 
+// Ambil data dengan aman
 $email = $_POST['email'] ?? '';
-$nik   = $_POST['nik'] ?? '';
-$pass  = $_POST['password'] ?? '';
+$nik = $_POST['nik'] ?? '';
+$password = $_POST['password'] ?? '';
 
-if ($email == '' || $nik == '' || $pass == '') {
+// Validasi input
+if ($email == '' || $nik == '' || $password == '') {
+    // Arahkan ke index.html di root
     echo "<script>alert('Data harus lengkap'); window.location='/index.html';</script>";
     exit;
 }
 
-// 2. Gunakan mysqli_real_escape_string untuk keamanan (mencegah SQL Injection)
-$email = mysqli_real_escape_string($koneksi, $email);
-$nik   = mysqli_real_escape_string($koneksi, $nik);
-
+// Query ke TiDB (Pastikan nama tabel 'user' sudah benar)
 $query = mysqli_query($koneksi, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
-$data  = mysqli_fetch_assoc($query);
+
+if (!$query) {
+    die("Query error: " . mysqli_error($koneksi));
+}
+
+$data = mysqli_fetch_assoc($query);
 
 if ($data) {
-    if (password_verify($pass, $data['password'])) {
+    // Verifikasi Password (Pastikan saat register kamu pakai password_hash)
+    if (password_verify($password, $data['password'])) {
 
-        // 3. Simpan data ke Session dengan bersih
         $_SESSION['login'] = true;
+        $_SESSION['role'] = strtolower(trim($data['role'])); 
         $_SESSION['email'] = $data['email'];
-        $_SESSION['role']  = strtolower(trim($data['role'])); // Solusi VARCHAR
 
-        // 4. PENTING: Paksa session tersimpan sebelum redirect
-        session_write_close();
-
-        if ($_SESSION['role'] === 'admin') {
+        // REDIRECT HARUS MENYEBUTKAN /api/ 
+        if ($_SESSION['role'] == 'admin') {
             header("Location: /api/admin_dashboard.php"); 
         } else {
             header("Location: /api/dashboard.php"); 
@@ -40,9 +41,12 @@ if ($data) {
         exit;
 
     } else {
+        // Balik ke login di root
         echo "<script>alert('Password salah'); window.location='/index.html';</script>";
     }
+
 } else {
-    echo "<script>alert('Akun tidak ditemukan'); window.location='/index.html';</script>";
+    // Balik ke login di root
+    echo "<script>alert('User tidak ditemukan'); window.location='/index.html';</script>";
 }
 ?>
