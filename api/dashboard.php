@@ -11,17 +11,29 @@ if (!$isLogin || $role !== 'user') {
     exit();
 }
 
-// 2. Pengambilan Data API BPS
+// 2. Pengambilan Data API BPS menggunakan cURL (Lebih Stabil di Vercel)
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-$ctx = stream_context_create(['http' => ['timeout' => 5]]); 
-$response = @file_get_contents($url, false, $ctx);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+// Menambahkan User-Agent agar tidak diblokir oleh API BPS
+curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+// Abaikan SSL jika bermasalah di environment tertentu
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
 $data_bps = json_decode($response, true);
 
 $headers = ["Provinsi"];
 $rows = [];
 
-if ($data_bps && isset($data_bps['data'][1])) {
+if ($httpCode == 200 && $data_bps && isset($data_bps['data'][1])) {
     $columns = $data_bps['data'][1]['kolom'];
     $column_keys = [];
 
@@ -39,10 +51,9 @@ if ($data_bps && isset($data_bps['data'][1])) {
         $rows[] = $row;
     }
 } else {
-    $headers[] = "Data Tidak Tersedia";
-    $rows[] = ["-", "Gagal memuat data dari BPS"];
+    $headers[] = "Status Error";
+    $rows[] = ["-", "Gagal memuat data (HTTP: $httpCode). Silakan coba lagi nanti."];
 }
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
