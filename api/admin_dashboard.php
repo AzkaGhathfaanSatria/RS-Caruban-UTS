@@ -1,18 +1,23 @@
 <?php
+// 1. Inisialisasi Output Buffering & Session (Wajib paling atas agar tidak blank)
+ob_start();
 session_set_cookie_params(0, '/');
 session_start();
 
+// 2. Sertakan koneksi (Ini yang tadi hilang, makanya blank karena variabel $koneksi tidak ada)
+require_once 'koneksi.php';
+
+// 3. Proteksi Halaman
 $role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
 
 if (!isset($_SESSION['login']) || $role !== 'admin') {
     header("Location: /index.html");
     exit;
 }
-// Sisa kode dashboard kamu...
 
-// 4. Hitung Statistik (Gunakan LOWER(TRIM()) agar hitungan akurat meski data di DB kotor)
-$total_user = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user"));
-$total_admin = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE LOWER(TRIM(role))='admin'"));
+// 4. Hitung Statistik (Gunakan LOWER(TRIM()) agar akurat)
+$total_user       = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user"));
+$total_admin      = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE LOWER(TRIM(role))='admin'"));
 $total_user_biasa = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE LOWER(TRIM(role))='user'"));
 
 $data_user = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
@@ -28,7 +33,6 @@ $data_user = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-
 <body class="bg-[#fcfcfd] text-slate-900 min-h-screen antialiased">
 
 <div class="max-w-7xl mx-auto p-4 md:p-8">
@@ -74,7 +78,6 @@ $data_user = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
                 <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Database Master</h2>
                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Manajemen Hak Akses Akun Terdaftar</p>
             </div>
-
             <a href="/api/tambah_admin.php" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95">
                 + Tambah Admin
             </a>
@@ -129,3 +132,7 @@ $data_user = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
 
 </body>
 </html>
+<?php
+// Tutup output buffering
+ob_end_flush();
+?>
