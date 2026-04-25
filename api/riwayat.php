@@ -1,19 +1,22 @@
 <?php
 session_start();
-include 'koneksi.php'; // Pastikan koneksi.php ada di folder api
+require_once(dirname(__FILE__) . '/koneksi.php'); // Menggunakan path yang lebih aman
 
-// 1. Proteksi Login
-if (!isset($_SESSION['login'])) {
-    header("Location: /index.html");
-    exit;
+// 1. Proteksi Login (Sistem Hybrid Session + Cookie)
+$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
+$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+$email_user_login = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
+
+// Jika tidak login atau bukan user, tendang ke login.php
+if (!$isLogin || $role !== 'user') {
+    header("Location: login.php");
+    exit();
 }
 
-$email_user_login = $_SESSION['email'];
-
-// 2. Ambil data (Gunakan $koneksi sesuai standar file koneksi kamu sebelumnya)
-$query = mysqli_query($koneksi, "SELECT * FROM pasien WHERE email='$email_user_login' ORDER BY id DESC");
+// 2. Ambil data (Gunakan variabel koneksi yang ada di koneksi.php kamu, biasanya $conn atau $koneksi)
+// Saya asumsikan $conn sesuai standar kita sebelumnya, jika namannya $koneksi silakan sesuaikan.
+$query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_login' ORDER BY id DESC");
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
