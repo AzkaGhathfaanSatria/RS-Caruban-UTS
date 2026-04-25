@@ -1,20 +1,19 @@
 <?php
-// Pastikan tidak ada spasi sebelum tag PHP ini
-ob_start();
 session_start();
 
-// 1. Perbaikan Pengecekan Session
-// Jika session hilang di Vercel, kita coba cek apakah data login ada
-if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
+// Cek Session ATAU Cookie (Solusi Vercel)
+$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
+$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+$email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
+
+if (!$isLogin || $role !== 'user') {
     header("Location: login.php");
     exit();
 }
 
-// Proteksi tambahan: Jika bukan user, arahkan ke login atau admin
-if ($_SESSION['role'] !== 'user') {
-    header("Location: login.php");
-    exit();
-}
+// ... sisa kode API BPS dan HTML tetap sama ...
+// Tapi ganti bagian cetak email menjadi:
+// <?php echo htmlspecialchars($email); ?>
 
 // 2. Penanganan API BPS yang lebih aman
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";

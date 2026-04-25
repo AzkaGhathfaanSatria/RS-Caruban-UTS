@@ -1,10 +1,11 @@
 <?php
-// Memulai session
 session_start();
-// Menghapus seluruh session
 session_destroy();
 
-// Diarahkan kembali ke halaman login.php
+// Hapus Cookie
+setcookie('user_login', '', time() - 3600, "/");
+setcookie('user_role', '', time() - 3600, "/");
+setcookie('user_email', '', time() - 3600, "/");
+
 header("Location: login.php");
-exit;
-?>
+exit();
