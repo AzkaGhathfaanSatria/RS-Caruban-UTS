@@ -5,12 +5,15 @@ $user = '3ZiKq6ZtEHR33K2.root';
 $pass = 'Sns4kG97NEXoBaRN';
 $db   = 'UTS-RSCaruban';
 
-$koneksi = mysqli_init();
-mysqli_options($koneksi, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
-mysqli_ssl_set($koneksi, NULL, NULL, NULL, NULL, NULL);
+$conn = mysqli_init();
+mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
-$real_connect = @mysqli_real_connect($koneksi, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
+// TiDB Cloud mewajibkan SSL
+mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+
+$real_connect = @mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$real_connect) {
-    die("Database Offline");
+    die("Database Offline: " . mysqli_connect_error());
 }
+?>
