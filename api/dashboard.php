@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// 1. Proteksi Session & Cookie (Solusi Vercel Stateless)
+// 1. Proteksi Session & Cookie
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
 $email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? 'User';
@@ -11,37 +11,46 @@ if (!$isLogin || $role !== 'user') {
     exit();
 }
 
-// 2. Pengambilan Data API BPS menggunakan cURL (Lebih Stabil di Vercel)
+// 2. Pengambilan Data API BPS (Hybrid Method)
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
+$response = false;
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-// Menambahkan User-Agent agar tidak diblokir oleh API BPS
-curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-// Abaikan SSL jika bermasalah di environment tertentu
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+if (function_exists('curl_init')) {
+    // PLAN A: cURL
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+    $response = curl_exec($ch);
+    curl_close($ch);
+} 
 
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+if ($response === false) {
+    // PLAN B: file_get_contents dengan User Agent
+    $opts = [
+        "http" => [
+            "method" => "GET",
+            "header" => "User-Agent: Mozilla/5.0\r\n",
+            "timeout" => 10
+        ]
+    ];
+    $context = stream_context_create($opts);
+    $response = @file_get_contents($url, false, $context);
+}
 
 $data_bps = json_decode($response, true);
-
 $headers = ["Provinsi"];
 $rows = [];
 
-if ($httpCode == 200 && $data_bps && isset($data_bps['data'][1])) {
+if ($data_bps && isset($data_bps['data'][1])) {
     $columns = $data_bps['data'][1]['kolom'];
     $column_keys = [];
-
     foreach ($columns as $key => $col) {
         $headers[] = $col['nama_variabel'];
         $column_keys[] = $key;
     }
-
     foreach ($data_bps['data'][1]['data'] as $item) {
         $row = [];
         $row[] = $item['label'];
@@ -51,9 +60,10 @@ if ($httpCode == 200 && $data_bps && isset($data_bps['data'][1])) {
         $rows[] = $row;
     }
 } else {
-    $headers[] = "Status Error";
-    $rows[] = ["-", "Gagal memuat data (HTTP: $httpCode). Silakan coba lagi nanti."];
+    $headers[] = "Info";
+    $rows[] = ["-", "Data tidak dapat dimuat dari server BPS."];
 }
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
