@@ -1,33 +1,55 @@
 <?php
+// Pastikan tidak ada spasi sebelum tag PHP ini
+ob_start();
 session_start();
 
-if (!isset($_SESSION['login']) || $_SESSION['role'] != 'user') {
+// 1. Perbaikan Pengecekan Session
+// Jika session hilang di Vercel, kita coba cek apakah data login ada
+if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     header("Location: login.php");
-    exit;
+    exit();
 }
 
+// Proteksi tambahan: Jika bukan user, arahkan ke login atau admin
+if ($_SESSION['role'] !== 'user') {
+    header("Location: login.php");
+    exit();
+}
+
+// 2. Penanganan API BPS yang lebih aman
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-$response = file_get_contents($url);
+// Menggunakan context timeout agar tidak "muter" selamanya jika API BPS lemot
+$ctx = stream_context_create(['http' => ['timeout' => 5]]); 
+$response = @file_get_contents($url, false, $ctx);
+
 $data_bps = json_decode($response, true);
 
+// Inisialisasi variabel agar tidak error jika API gagal
 $headers = ["Provinsi"];
-$columns = $data_bps['data'][1]['kolom'];
-$column_keys = [];
-
-foreach ($columns as $key => $col) {
-    $headers[] = $col['nama_variabel'];
-    $column_keys[] = $key;
-}
-
 $rows = [];
-foreach ($data_bps['data'][1]['data'] as $item) {
-    $row = [];
-    $row[] = $item['label'];
-    foreach ($column_keys as $key) {
-        $row[] = $item['variables'][$key]['value'] ?? "-";
+
+if ($data_bps && isset($data_bps['data'][1])) {
+    $columns = $data_bps['data'][1]['kolom'];
+    $column_keys = [];
+
+    foreach ($columns as $key => $col) {
+        $headers[] = $col['nama_variabel'];
+        $column_keys[] = $key;
     }
-    $rows[] = $row;
+
+    foreach ($data_bps['data'][1]['data'] as $item) {
+        $row = [];
+        $row[] = $item['label'];
+        foreach ($column_keys as $key) {
+            $row[] = $item['variables'][$key]['value'] ?? "-";
+        }
+        $rows[] = $row;
+    }
+} else {
+    // Jika API Gagal, beri baris kosong agar tabel tidak hancur
+    $headers[] = "Data Tidak Tersedia";
+    $rows[] = ["-", "Gagal memuat data dari BPS"];
 }
 ?>
 
@@ -37,7 +59,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard User | RS Caruban</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -62,7 +84,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
             <div>
                 <h1 class="text-lg font-bold text-slate-800 leading-none">Dashboard User</h1>
                 <p class="text-slate-500 text-xs mt-1 font-medium italic opacity-80">
-                    <?php echo $_SESSION['email']; ?>
+                    <?php echo htmlspecialchars($_SESSION['email']); ?>
                 </p>
             </div>
         </div>
@@ -102,9 +124,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
     </div>
 
     <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-3xl shadow-sm flex items-start md:items-center gap-4 mb-8">
-        <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-200 text-white font-bold">
-             !
-        </div>
+        <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-200 text-white font-bold">!</div>
         <div class="flex-1">
             <p class="text-sm text-indigo-900 font-bold leading-tight">Verifikasi Data</p>
             <p class="text-xs md:text-sm text-indigo-700/80 font-medium mt-0.5">
@@ -116,7 +136,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
     <section class="bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden mb-12">
         <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h2 class="text-xl font-black text-slate-800 tracking-tight">STATISTIK PENYAKIT 2025</h2>
+                <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Statistik Penyakit 2025</h2>
                 <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Sumber: Interoperabilitas BPS</p>
             </div>
             <div class="bg-slate-100 px-4 py-2 rounded-xl text-[10px] font-black text-slate-500 tracking-tighter uppercase shadow-inner">
@@ -130,52 +150,47 @@ foreach ($data_bps['data'][1]['data'] as $item) {
                     <tr class="bg-slate-900 shadow-md">
                         <?php foreach ($headers as $h) { ?>
                             <th class="px-6 py-5 text-[11px] font-black text-white uppercase tracking-widest border-r border-slate-800 last:border-none">
-                                <div class="flex items-center gap-2">
-                                    <?php echo htmlspecialchars($h); ?>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
+                                <?php echo htmlspecialchars($h); ?>
                             </th>
                         <?php } ?>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    <?php foreach ($rows as $row) { ?>
-                        <tr class="hover:bg-slate-50 transition-colors group">
-                            <?php foreach ($row as $index => $cell) { ?>
-                                <td class="px-6 py-4 text-sm <?php echo $index === 0 ? 'font-black text-blue-600 bg-slate-50/50' : 'text-slate-600 font-medium'; ?> border-r border-slate-50 last:border-none">
-                                    <?php echo htmlspecialchars($cell); ?>
-                                </td>
-                            <?php } ?>
-                        </tr>
-                    <?php } ?>
+                    <?php if (empty($rows)): ?>
+                        <tr><td colspan="100%" class="p-10 text-center text-slate-400 font-medium">Data sedang tidak tersedia...</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($rows as $row) { ?>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <?php foreach ($row as $index => $cell) { ?>
+                                    <td class="px-6 py-4 text-sm <?php echo $index === 0 ? 'font-black text-blue-600 bg-slate-50/50' : 'text-slate-600 font-medium'; ?> border-r border-slate-50 last:border-none">
+                                        <?php echo htmlspecialchars($cell); ?>
+                                    </td>
+                                <?php } ?>
+                            </tr>
+                        <?php } ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </section>
-
 </div>
 
 <footer class="bg-white border-t border-slate-200 py-12">
     <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-center md:text-left">
         <div>
             <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Lokasi</h3>
-            <p class="text-slate-500 text-sm leading-relaxed font-medium">Caruban, Madiun, Jawa Timur<br>Indonesia</p>
+            <p class="text-slate-500 text-sm font-medium">Caruban, Madiun, Jawa Timur<br>Indonesia</p>
         </div>
         <div>
             <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Kontak Resmi</h3>
-            <p class="text-slate-500 text-sm leading-relaxed font-medium">
-                Sistem Informasi: 021-912007<br>
-                WhatsApp Center: 0812-2345-6789
-            </p>
+            <p class="text-slate-500 text-sm font-medium">Sistem Informasi: 021-912007<br>WhatsApp Center: 0812-2345-6789</p>
         </div>
         <div class="flex flex-col md:items-end justify-center">
             <div class="text-right">
-                <h3 class="text-lg font-black text-blue-600 leading-none">RS CARUBAN</h3>
-                <p class="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black mt-1 text-right">Integrity in Health</p>
+                <h3 class="text-lg font-black text-blue-600">RS CARUBAN</h3>
+                <p class="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black mt-1">Integrity in Health</p>
             </div>
-            <p class="text-slate-400 text-[11px] mt-6 font-medium">© 2026 RS Caruban. All Rights Reserved.</p>
+            <p class="text-slate-400 text-[11px] mt-6 font-medium">© 2026 RS Caruban.</p>
         </div>
     </div>
 </footer>
