@@ -1,37 +1,42 @@
 <?php
+ob_start(); // Mencegah error output sebelum redirect
 session_start();
-// Menggunakan dirname agar path file koneksi selalu benar di server Vercel
+
+// Pastikan file koneksi terpanggil dengan benar
 require_once(dirname(__FILE__) . '/koneksi.php');
 
-// Ambil data dari POST
-$email = $_POST['email'] ?? '';
-$nik = $_POST['nik'] ?? '';
-$password = $_POST['password'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $nik = mysqli_real_escape_string($conn, $_POST['nik']);
+    $password = $_POST['password'];
 
-// Menggunakan Prepared Statements untuk keamanan (Mencegah SQL Injection)
-$stmt = mysqli_prepare($conn, "SELECT * FROM user WHERE email=? AND nik=?");
-mysqli_stmt_bind_param($stmt, "ss", $email, $nik);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$data = mysqli_fetch_assoc($result);
+    // Query sederhana dulu untuk memastikan data narik
+    $sql = "SELECT * FROM user WHERE email='$email' AND nik='$nik' LIMIT 1";
+    $query = mysqli_query($conn, $sql);
 
-if ($data) {
-    // Verifikasi password
-    if (password_verify($password, $data['password'])) {
-        $_SESSION['login'] = true;
-        $_SESSION['role'] = $data['role'];
-        $_SESSION['email'] = $data['email'];
+    if ($query && mysqli_num_rows($query) > 0) {
+        $data = mysqli_fetch_assoc($query);
 
-        if ($data['role'] == 'admin') {
-            header("Location: admin_dashboard.php");
+        if (password_verify($password, $data['password'])) {
+            $_SESSION['login'] = true;
+            $_SESSION['role']  = $data['role'];
+            $_SESSION['email'] = $data['email'];
+
+            // Gunakan path absolut untuk redirect di Vercel
+            if ($data['role'] == 'admin') {
+                header("Location: admin_dashboard.php");
+            } else {
+                header("Location: dashboard.php");
+            }
+            exit();
         } else {
-            header("Location: dashboard.php");
+            echo "<script>alert('Password salah!'); window.location='login.php';</script>";
         }
-        exit;
     } else {
-        echo "<script>alert('Password salah'); window.location='login.php';</script>";
+        echo "<script>alert('User tidak ditemukan!'); window.location='login.php';</script>";
     }
 } else {
-    echo "<script>alert('User tidak ditemukan atau NIK/Email salah'); window.location='login.php';</script>";
+    header("Location: login.php");
 }
+ob_end_flush();
 ?>

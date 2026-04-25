@@ -6,14 +6,18 @@ $pass = 'Sns4kG97NEXoBaRN';
 $db   = 'UTS-RSCaruban';
 
 $conn = mysqli_init();
-mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10); // Naikkan timeout jadi 10 detik
 
-// TiDB Cloud mewajibkan SSL
-mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+// Tambahkan minimal satu parameter SSL jika TiDB Cloud
+if (defined('MYSQLI_CLIENT_SSL')) {
+    mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+}
 
 $real_connect = @mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$real_connect) {
-    die("Database Offline: " . mysqli_connect_error());
+    // Jangan pakai die saja, beri info errornya
+    error_log("Koneksi TiDB Gagal: " . mysqli_connect_error());
+    die("Koneksi database bermasalah. Silakan cek koneksi internet atau konfigurasi DB.");
 }
 ?>
