@@ -1,30 +1,23 @@
 <?php
 session_start();
 
-// Cek Session ATAU Cookie (Solusi Vercel)
+// 1. Proteksi Session & Cookie (Solusi Vercel Stateless)
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
-$email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
+$email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? 'User';
 
 if (!$isLogin || $role !== 'user') {
     header("Location: login.php");
     exit();
 }
 
-// ... sisa kode API BPS dan HTML tetap sama ...
-// Tapi ganti bagian cetak email menjadi:
-// <?php echo htmlspecialchars($email); ?>
-
-// 2. Penanganan API BPS yang lebih aman
+// 2. Pengambilan Data API BPS
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-// Menggunakan context timeout agar tidak "muter" selamanya jika API BPS lemot
 $ctx = stream_context_create(['http' => ['timeout' => 5]]); 
 $response = @file_get_contents($url, false, $ctx);
-
 $data_bps = json_decode($response, true);
 
-// Inisialisasi variabel agar tidak error jika API gagal
 $headers = ["Provinsi"];
 $rows = [];
 
@@ -46,12 +39,10 @@ if ($data_bps && isset($data_bps['data'][1])) {
         $rows[] = $row;
     }
 } else {
-    // Jika API Gagal, beri baris kosong agar tabel tidak hancur
     $headers[] = "Data Tidak Tersedia";
     $rows[] = ["-", "Gagal memuat data dari BPS"];
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -70,7 +61,6 @@ if ($data_bps && isset($data_bps['data'][1])) {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-
 <body class="bg-[#f8fafc] text-slate-900 min-h-screen flex flex-col tracking-tight">
 
 <div class="max-w-7xl mx-auto p-4 md:p-8 w-full flex-1">
@@ -83,7 +73,7 @@ if ($data_bps && isset($data_bps['data'][1])) {
             <div>
                 <h1 class="text-lg font-bold text-slate-800 leading-none">Dashboard User</h1>
                 <p class="text-slate-500 text-xs mt-1 font-medium italic opacity-80">
-                    <?php echo htmlspecialchars($_SESSION['email']); ?>
+                    <?php echo htmlspecialchars($email); ?>
                 </p>
             </div>
         </div>
