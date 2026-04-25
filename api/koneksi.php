@@ -1,14 +1,9 @@
 <?php
-// Matikan semua output buffering
-ob_end_clean();
-
 $host = 'gateway01.ap-southeast-1.prod.alicloud.tidbcloud.com';
 $port = 4000;
 $user = '3ZiKq6ZtEHR33K2.root';
 $pass = 'Sns4kG97NEXoBaRN';
 $db   = 'UTS-RSCaruban';
-
-echo "Memulai koneksi...<br>";
 
 $koneksi = mysqli_init();
 mysqli_options($koneksi, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
@@ -26,8 +21,7 @@ $real_connect = mysqli_real_connect(
 );
 
 if (!$real_connect) {
-    die("❌ KONEKSI GAGAL: " . mysqli_connect_error());
+    die("Koneksi Gagal");
 }
-
-echo "✅ KONEKSI BERHASIL!";
+// JANGAN ADA ECHO ATAU TEXT DI SINI
 ?>
