@@ -4,15 +4,7 @@ session_set_cookie_params(0, '/');
 session_start();
 include 'koneksi.php';
 
-// 2. Proteksi Login (Aktifkan kembali dengan pengecekan VARCHAR yang aman)
-if (!isset($_SESSION['login'])) {
-    header("Location: /index.html");
-    exit;
-}
 
-// Pastikan yang masuk ke sini HANYA user (atau admin juga boleh lihat dashboard ini)
-$role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
-$email_user = $_SESSION['email'];
 
 // --- 3. LOGIC API BPS (Tetap dipertahankan dengan sedikit perapian) ---
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
