@@ -1,11 +1,26 @@
 <?php
 session_start();
 
-// FIX PATH: Periksa session, jika gagal lempar ke index.html di root (/)
-if (!isset($_SESSION['login']) || $_SESSION['role'] != 'user') {
+<?php
+session_start();
+
+// Debugging: Jika masih mental, aktifkan baris di bawah untuk melihat isi session sebenarnya
+// die(print_r($_SESSION, true)); 
+
+if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     header("Location: /index.html");
     exit;
 }
+
+// Gunakan strtolower lagi di sini sebagai pengaman ganda
+$current_role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
+
+if ($current_role !== 'user') {
+    header("Location: /index.html");
+    exit;
+}
+
+// ... sisa kode BPS dan HTML ...
 
 // Data API BPS tetap sama
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
