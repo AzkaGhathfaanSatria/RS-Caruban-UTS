@@ -1,13 +1,16 @@
 <?php
 session_start();
 
-// Proteksi Session: Gunakan path absolut untuk keamanan di Vercel
-if (!isset($_SESSION['login'])) {
-    header("Location: /index.html");
-    exit;
+// 1. Cek Session ATAU Cookie (Sesuai sistem yang kita buat di login & dashboard)
+$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
+$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+
+// Jika tidak login atau bukan user, tendang ke login.php
+if (!$isLogin || $role !== 'user') {
+    header("Location: login.php");
+    exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
