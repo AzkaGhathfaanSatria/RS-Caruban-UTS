@@ -1,4 +1,15 @@
-<?php session_start(); ?>
+<?php
+// Gunakan pengaturan cookie yang sama agar session terbaca
+session_set_cookie_params(0, '/');
+session_start();
+
+// Jika sudah login, jangan kasih akses ke halaman login lagi, langsung lempar ke dashboard
+if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
+    $target = ($_SESSION['role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+    header("Location: /api/$target");
+    exit;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="id">
@@ -16,7 +27,6 @@
             background-color: #f0f9ff;
             background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px);
             background-size: 30px 30px;
-            background-opacity: 0.05;
         }
     </style>
 </head>
@@ -24,7 +34,6 @@
 <body class="bg-medical min-h-screen flex flex-col antialiased">
 
 <div class="flex justify-center items-center flex-grow p-6">
-
     <div class="bg-white/90 backdrop-blur-xl border border-slate-100 p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-blue-900/10 w-full max-w-md">
 
         <div class="text-center mb-10">
@@ -35,23 +44,18 @@
             <p class="text-slate-500 font-medium mt-2">Masuk untuk mengakses layanan RS Caruban</p>
         </div>
 
-        <?php if(isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-center mb-6 animate-pulse">
-                <?php 
-                    echo $_SESSION['error']; 
-                    unset($_SESSION['error']);
-                ?>
+        <?php if(isset($_GET['error'])): ?>
+            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center mb-6">
+                Login Gagal! Periksa Email/NIK/Password.
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="proses_login.php" class="space-y-5">
+        <form method="POST" action="api/proses_login.php" class="space-y-5">
             
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Email Registrasi</label>
-                <div class="relative">
-                    <input type="email" name="email" required placeholder="nama@email.com"
-                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none font-medium text-slate-700">
-                </div>
+                <input type="email" name="email" required placeholder="nama@email.com"
+                class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none font-medium text-slate-700">
             </div>
 
             <div>
@@ -66,7 +70,7 @@
                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none font-medium text-slate-700">
             </div>
 
-            <button class="w-full bg-blue-600 text-white p-4 mt-2 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-200 active:scale-95 transition-all">
+            <button type="submit" class="w-full bg-blue-600 text-white p-4 mt-2 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-200 active:scale-95 transition-all">
                 Masuk ke Sistem
             </button>
 
