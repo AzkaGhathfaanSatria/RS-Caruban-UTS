@@ -1,52 +1,54 @@
 <?php
+// 1. Inisialisasi Session paling atas
+session_set_cookie_params(0, '/'); 
 session_start();
-// File koneksi harus ada di dalam folder api juga
-include 'koneksi.php';
 
-// Ambil data dengan aman
-$email = $_POST['email'] ?? '';
-$nik = $_POST['nik'] ?? '';
-$password = $_POST['password'] ?? '';
+// 2. Panggil koneksi (yang tadi sudah terbukti berhasil)
+require_once 'koneksi.php';
 
-// Validasi input
-if ($email == '' || $nik == '' || $password == '') {
-    // Arahkan ke index.html di root
-    echo "<script>alert('Data harus lengkap'); window.location='/index.html';</script>";
+// 3. Ambil data dari form
+$email = mysqli_real_escape_string($koneksi, $_POST['email'] ?? '');
+$nik   = mysqli_real_escape_string($koneksi, $_POST['nik'] ?? '');
+$pass  = $_POST['password'] ?? '';
+
+// 4. Cek apakah input kosong
+if (empty($email) || empty($nik) || empty($pass)) {
+    echo "<script>alert('Data tidak boleh kosong!'); window.location.href='/index.html';</script>";
     exit;
 }
 
-// Query ke TiDB (Pastikan nama tabel 'user' sudah benar)
-$query = mysqli_query($koneksi, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
-
-if (!$query) {
-    die("Query error: " . mysqli_error($koneksi));
-}
-
+// 5. Cari user di database
+$sql = "SELECT * FROM user WHERE email='$email' AND nik='$nik' LIMIT 1";
+$query = mysqli_query($koneksi, $sql);
 $data = mysqli_fetch_assoc($query);
 
 if ($data) {
-    // Verifikasi Password (Pastikan saat register kamu pakai password_hash)
-    if (password_verify($password, $data['password'])) {
-
+    // 6. Verifikasi Password (karena kamu bilang sudah di-hash)
+    if (password_verify($pass, $data['password'])) {
+        
+        // Simpan data ke session
         $_SESSION['login'] = true;
-        $_SESSION['role'] = strtolower(trim($data['role'])); 
         $_SESSION['email'] = $data['email'];
+        $_SESSION['role']  = strtolower(trim($data['role']));
 
-        // REDIRECT HARUS MENYEBUTKAN /api/ 
-        if ($_SESSION['role'] == 'admin') {
-            header("Location: /api/admin_dashboard.php"); 
-        } else {
-            header("Location: /api/dashboard.php"); 
-        }
+        // Kunci session sebelum pindah halaman
+        session_write_close();
+
+        // 7. Tentukan halaman tujuan
+        $redirect_to = ($_SESSION['role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+        
+        // Gunakan JavaScript Redirect agar tidak blank di Vercel
+        echo "<script>window.location.href='/api/$redirect_to';</script>";
         exit;
 
     } else {
-        // Balik ke login di root
-        echo "<script>alert('Password salah'); window.location='/index.html';</script>";
+        // Password salah
+        echo "<script>alert('Password salah!'); window.location.href='/index.html?error=1';</script>";
+        exit;
     }
-
 } else {
-    // Balik ke login di root
-    echo "<script>alert('User tidak ditemukan'); window.location='/index.html';</script>";
+    // User tidak ditemukan
+    echo "<script>alert('Email atau NIK tidak terdaftar!'); window.location.href='/index.html?error=1';</script>";
+    exit;
 }
 ?>

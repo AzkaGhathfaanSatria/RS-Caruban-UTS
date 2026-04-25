@@ -1,17 +1,14 @@
 <?php
-// 1. Session Setup khusus Vercel
-session_set_cookie_params(0, '/'); 
+session_set_cookie_params(0, '/');
 session_start();
-include 'koneksi.php'; 
 
-// 2. Ambil Role & Bersihkan (Solusi VARCHAR)
 $role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
 
-// 3. PROTEKSI SESSION (Gunakan variabel $role yang sudah bersih)
 if (!isset($_SESSION['login']) || $role !== 'admin') {
-    header("Location: /index.html"); 
+    header("Location: /index.html");
     exit;
 }
+// Sisa kode dashboard kamu...
 
 // 4. Hitung Statistik (Gunakan LOWER(TRIM()) agar hitungan akurat meski data di DB kotor)
 $total_user = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user"));
