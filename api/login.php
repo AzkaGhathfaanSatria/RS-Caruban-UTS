@@ -1,5 +1,3 @@
-<?php session_start(); ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,7 +14,6 @@
             background-color: #f0f9ff;
             background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px);
             background-size: 30px 30px;
-            background-opacity: 0.05;
         }
     </style>
 </head>
@@ -35,16 +32,11 @@
             <p class="text-slate-500 font-medium mt-2">Masuk untuk mengakses layanan RS Caruban</p>
         </div>
 
-        <?php if(isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-center mb-6 animate-pulse">
-                <?php 
-                    echo $_SESSION['error']; 
-                    unset($_SESSION['error']);
-                ?>
-            </div>
-        <?php endif; ?>
+        <div id="error-box" class="hidden bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-center mb-6 animate-pulse">
+            Login Gagal! Cek kembali data Anda.
+        </div>
 
-        <form method="POST" action="proses_login.php" class="space-y-5">
+        <form method="POST" action="/api/proses_login.php" class="space-y-5">
             
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Email Registrasi</label>
@@ -66,7 +58,7 @@
                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all outline-none font-medium text-slate-700">
             </div>
 
-            <button class="w-full bg-blue-600 text-white p-4 mt-2 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-200 active:scale-95 transition-all">
+            <button type="submit" class="w-full bg-blue-600 text-white p-4 mt-2 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-200 active:scale-95 transition-all">
                 Masuk ke Sistem
             </button>
 
@@ -75,7 +67,7 @@
         <div class="mt-10 pt-6 border-t border-slate-50 text-center">
             <p class="text-sm font-medium text-slate-500">
                 Belum memiliki akun? 
-                <a href="register.php" class="text-blue-600 font-bold hover:text-blue-700 underline underline-offset-4 decoration-2">
+                <a href="/api/register.php" class="text-blue-600 font-bold hover:text-blue-700 underline underline-offset-4 decoration-2">
                     Daftar di sini
                 </a>
             </p>
@@ -93,6 +85,14 @@
         <p class="text-slate-300 text-[10px] mt-4 font-bold tracking-tighter">© 2026 RS CARUBAN. ALL RIGHTS RESERVED.</p>
     </div>
 </footer>
+
+<script>
+    // Script sederhana untuk nangkep error dari URL (misal: ?error=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('error')) {
+        document.getElementById('error-box').classList.remove('hidden');
+    }
+</script>
 
 </body>
 </html>

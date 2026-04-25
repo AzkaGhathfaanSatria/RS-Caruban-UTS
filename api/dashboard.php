@@ -1,35 +1,41 @@
 <?php
 session_start();
 
-$role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
-
+// FIX PATH: Periksa session, jika gagal lempar ke index.html di root (/)
 if (!isset($_SESSION['login']) || $_SESSION['role'] != 'user') {
-    header("Location: login.php");
+    header("Location: /index.html");
     exit;
 }
 
+// Data API BPS tetap sama
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-$response = file_get_contents($url);
-$data_bps = json_decode($response, true);
+// Menambahkan sedikit error handling agar dashboard tidak crash jika API BPS down
+$response = @file_get_contents($url);
+if ($response === FALSE) {
+    $rows = [];
+    $headers = ["Data tidak tersedia"];
+} else {
+    $data_bps = json_decode($response, true);
+    $headers = ["Provinsi"];
+    $columns = $data_bps['data'][1]['kolom'] ?? [];
+    $column_keys = [];
 
-$headers = ["Provinsi"];
-$columns = $data_bps['data'][1]['kolom'];
-$column_keys = [];
-
-foreach ($columns as $key => $col) {
-    $headers[] = $col['nama_variabel'];
-    $column_keys[] = $key;
-}
-
-$rows = [];
-foreach ($data_bps['data'][1]['data'] as $item) {
-    $row = [];
-    $row[] = $item['label'];
-    foreach ($column_keys as $key) {
-        $row[] = $item['variables'][$key]['value'] ?? "-";
+    foreach ($columns as $key => $col) {
+        $headers[] = $col['nama_variabel'];
+        $column_keys[] = $key;
     }
-    $rows[] = $row;
+
+    $rows = [];
+    $raw_data = $data_bps['data'][1]['data'] ?? [];
+    foreach ($raw_data as $item) {
+        $row = [];
+        $row[] = $item['label'];
+        foreach ($column_keys as $key) {
+            $row[] = $item['variables'][$key]['value'] ?? "-";
+        }
+        $rows[] = $row;
+    }
 }
 ?>
 
@@ -64,12 +70,12 @@ foreach ($data_bps['data'][1]['data'] as $item) {
             <div>
                 <h1 class="text-lg font-bold text-slate-800 leading-none">Dashboard User</h1>
                 <p class="text-slate-500 text-xs mt-1 font-medium italic opacity-80">
-                    <?php echo $_SESSION['email']; ?>
+                    <?php echo htmlspecialchars($_SESSION['email']); ?>
                 </p>
             </div>
         </div>
 
-        <a href="logout.php" class="group flex items-center gap-2 bg-slate-100 text-slate-600 px-5 py-2.5 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all duration-300 border border-transparent hover:border-red-100">
+        <a href="/api/logout.php" class="group flex items-center gap-2 bg-slate-100 text-slate-600 px-5 py-2.5 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all duration-300 border border-transparent hover:border-red-100">
             <span class="text-sm font-bold">Logout</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -84,7 +90,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
                 <div class="mb-4 inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl italic font-bold">🏥</div>
                 <h2 class="text-xl font-bold mb-2">Pendaftaran Pasien</h2>
                 <p class="text-sm text-slate-500 mb-6 leading-relaxed">Daftar sekarang untuk mendapatkan layanan kesehatan terbaik tanpa antri lama.</p>
-                <a href="pendaftaran.php" class="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 active:scale-95 transition-all">
+                <a href="/api/pendaftaran.php" class="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-blue-700 shadow-lg shadow-blue-100 active:scale-95 transition-all">
                     Daftar Sekarang
                 </a>
             </div>
@@ -96,22 +102,10 @@ foreach ($data_bps['data'][1]['data'] as $item) {
                 <div class="mb-4 inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-2xl italic font-bold">📋</div>
                 <h2 class="text-xl font-bold mb-2">Riwayat Medis</h2>
                 <p class="text-sm text-slate-500 mb-6 leading-relaxed">Pantau perkembangan kesehatanmu dengan melihat catatan riwayat kunjungan.</p>
-                <a href="riwayat.php" class="inline-flex items-center justify-center bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-700 shadow-lg shadow-emerald-100 active:scale-95 transition-all">
+                <a href="/api/riwayat.php" class="inline-flex items-center justify-center bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-700 shadow-lg shadow-emerald-100 active:scale-95 transition-all">
                     Lihat Riwayat
                 </a>
             </div>
-        </div>
-    </div>
-
-    <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-3xl shadow-sm flex items-start md:items-center gap-4 mb-8">
-        <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-200 text-white font-bold">
-             !
-        </div>
-        <div class="flex-1">
-            <p class="text-sm text-indigo-900 font-bold leading-tight">Verifikasi Data</p>
-            <p class="text-xs md:text-sm text-indigo-700/80 font-medium mt-0.5">
-                Pastikan data yang dimasukkan sudah benar sebelum dikirim untuk mempermudah sinkronisasi dengan sistem pusat RS Caruban.
-            </p>
         </div>
     </div>
 
@@ -132,31 +126,29 @@ foreach ($data_bps['data'][1]['data'] as $item) {
                     <tr class="bg-slate-900 shadow-md">
                         <?php foreach ($headers as $h) { ?>
                             <th class="px-6 py-5 text-[11px] font-black text-white uppercase tracking-widest border-r border-slate-800 last:border-none">
-                                <div class="flex items-center gap-2">
-                                    <?php echo htmlspecialchars($h); ?>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
+                                <?php echo htmlspecialchars($h); ?>
                             </th>
                         <?php } ?>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    <?php foreach ($rows as $row) { ?>
-                        <tr class="hover:bg-slate-50 transition-colors group">
-                            <?php foreach ($row as $index => $cell) { ?>
-                                <td class="px-6 py-4 text-sm <?php echo $index === 0 ? 'font-black text-blue-600 bg-slate-50/50' : 'text-slate-600 font-medium'; ?> border-r border-slate-50 last:border-none">
-                                    <?php echo htmlspecialchars($cell); ?>
-                                </td>
-                            <?php } ?>
-                        </tr>
-                    <?php } ?>
+                    <?php if (empty($rows)): ?>
+                        <tr><td colspan="100%" class="p-10 text-center text-slate-400 italic">Data sedang memuat atau tidak tersedia.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($rows as $row) { ?>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <?php foreach ($row as $index => $cell) { ?>
+                                    <td class="px-6 py-4 text-sm <?php echo $index === 0 ? 'font-black text-blue-600 bg-slate-50/50' : 'text-slate-600 font-medium'; ?> border-r border-slate-50 last:border-none">
+                                        <?php echo htmlspecialchars($cell); ?>
+                                    </td>
+                                <?php } ?>
+                            </tr>
+                        <?php } ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </section>
-
 </div>
 
 <footer class="bg-white border-t border-slate-200 py-12">
@@ -175,7 +167,7 @@ foreach ($data_bps['data'][1]['data'] as $item) {
         <div class="flex flex-col md:items-end justify-center">
             <div class="text-right">
                 <h3 class="text-lg font-black text-blue-600 leading-none">RS CARUBAN</h3>
-                <p class="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black mt-1 text-right">Integrity in Health</p>
+                <p class="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black mt-1">Integrity in Health</p>
             </div>
             <p class="text-slate-400 text-[11px] mt-6 font-medium">© 2026 RS Caruban. All Rights Reserved.</p>
         </div>
