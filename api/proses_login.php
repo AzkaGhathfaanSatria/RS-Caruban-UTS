@@ -1,52 +1,43 @@
 <?php
 session_start();
-// File koneksi harus ada di dalam folder api juga
 include 'koneksi.php';
 
-// Ambil data dengan aman
 $email = $_POST['email'] ?? '';
 $nik = $_POST['nik'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Validasi input
 if ($email == '' || $nik == '' || $password == '') {
-    // Arahkan ke index.html di root
     echo "<script>alert('Data harus lengkap'); window.location='/index.html';</script>";
     exit;
 }
 
-// Query ke TiDB (Pastikan nama tabel 'user' sudah benar)
+// Proteksi SQL Injection sederhana
+$email = mysqli_real_escape_string($koneksi, $email);
+$nik = mysqli_real_escape_string($koneksi, $nik);
+
 $query = mysqli_query($koneksi, "SELECT * FROM user WHERE email='$email' AND nik='$nik'");
-
-if (!$query) {
-    die("Query error: " . mysqli_error($koneksi));
-}
-
 $data = mysqli_fetch_assoc($query);
 
 if ($data) {
-    // Verifikasi Password (Pastikan saat register kamu pakai password_hash)
     if (password_verify($password, $data['password'])) {
-
+        // SET SESSION
         $_SESSION['login'] = true;
-        $_SESSION['role'] = strtolower(trim($data['role'])); 
         $_SESSION['email'] = $data['email'];
+        $_SESSION['role'] = strtolower(trim($data['role']));
 
-        // REDIRECT HARUS MENYEBUTKAN /api/ 
-        if ($_SESSION['role'] == 'admin') {
-            header("Location: /api/admin_dashboard.php"); 
-        } else {
-            header("Location: /api/dashboard.php"); 
-        }
+        // KRITIKAL: Paksa simpan session sebelum redirect
+        session_write_close();
+
+        // Redirect pakai JS lebih aman di lingkungan serverless/Vercel
+        $target = ($_SESSION['role'] == 'admin') ? '/api/admin_dashboard.php' : '/api/dashboard.php';
+        echo "<script>window.location.href='$target';</script>";
         exit;
-
     } else {
-        // Balik ke login di root
         echo "<script>alert('Password salah'); window.location='/index.html';</script>";
+        exit;
     }
-
 } else {
-    // Balik ke login di root
     echo "<script>alert('User tidak ditemukan'); window.location='/index.html';</script>";
+    exit;
 }
 ?>
