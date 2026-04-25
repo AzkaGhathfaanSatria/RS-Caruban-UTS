@@ -25,34 +25,56 @@ if ($current_role !== 'user') {
 // Data API BPS tetap sama
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-// Menambahkan sedikit error handling agar dashboard tidak crash jika API BPS down
-$response = @file_get_contents($url);
-if ($response === FALSE) {
-    $rows = [];
-    $headers = ["Data tidak tersedia"];
-} else {
+// Pakai stream context karena beberapa API memblokir file_get_contents tanpa User-Agent
+$opts = ["http" => ["header" => "User-Agent: PHP\r\n"]];
+$context = stream_context_create($opts);
+$response = @file_get_contents($url, false, $context);
+
+$headers = ["Provinsi"];
+$rows = [];
+
+if ($response !== FALSE) {
     $data_bps = json_decode($response, true);
-    $headers = ["Provinsi"];
-    $columns = $data_bps['data'][1]['kolom'] ?? [];
-    $column_keys = [];
-
-    foreach ($columns as $key => $col) {
-        $headers[] = $col['nama_variabel'];
-        $column_keys[] = $key;
-    }
-
-    $rows = [];
-    $raw_data = $data_bps['data'][1]['data'] ?? [];
-    foreach ($raw_data as $item) {
-        $row = [];
-        $row[] = $item['label'];
-        foreach ($column_keys as $key) {
-            $row[] = $item['variables'][$key]['value'] ?? "-";
+    
+    // PERBAIKAN LOGIKA: Cek apakah indeks 'data' ada dan tidak kosong
+    // Kita cari secara dinamis di mana letak array kolom dan datanya
+    $main_data = null;
+    if (isset($data_bps['data']) && is_array($data_bps['data'])) {
+        foreach ($data_bps['data'] as $item_check) {
+            if (isset($item_check['kolom']) && isset($item_check['data'])) {
+                $main_data = $item_check;
+                break;
+            }
         }
-        $rows[] = $row;
     }
+
+    if ($main_data) {
+        $columns = $main_data['kolom'];
+        $column_keys = [];
+
+        foreach ($columns as $key => $col) {
+            $headers[] = $col['nama_variabel'];
+            $column_keys[] = $key;
+        }
+
+        $raw_data = $main_data['data'];
+        foreach ($raw_data as $item) {
+            $row = [];
+            $row[] = $item['label'];
+            foreach ($column_keys as $key) {
+                // Gunakan null coalescing agar tidak error jika value tidak ada
+                $row[] = $item['variables'][$key]['value'] ?? "-";
+            }
+            $rows[] = $row;
+        }
+    } else {
+        $headers = ["Info"];
+        $rows = [["Struktur data API tidak sesuai atau sedang maintenance"]];
+    }
+} else {
+    $headers = ["Error"];
+    $rows = [["Gagal terhubung ke server BPS"]];
 }
-?>
 
 <!DOCTYPE html>
 <html lang="id">
