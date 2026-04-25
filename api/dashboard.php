@@ -1,29 +1,26 @@
 <?php
+// PAKSA TAMPILKAN ERROR
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 
-// Debugging: Jika masih mental, aktifkan baris di bawah untuk melihat isi session sebenarnya
-// die(print_r($_SESSION, true)); 
-
-if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
+// MATIKAN PENJAGAAN LOGIN (Dicomment dulu biar bisa masuk)
+/*
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== 'user') {
     header("Location: /index.html");
     exit;
 }
+*/
 
-// Gunakan strtolower lagi di sini sebagai pengaman ganda
-$current_role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
+// Set data palsu biar variabel di bawah ga error
+$_SESSION['email'] = "Mode-Testing@caruban.com";
 
-if ($current_role !== 'user') {
-    header("Location: /index.html");
-    exit;
-}
-
-// ... sisa kode BPS dan HTML ...
-
-// Data API BPS tetap sama
+// --- MULAI KODE API BPS ---
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 
-// Pakai stream context karena beberapa API memblokir file_get_contents tanpa User-Agent
-$opts = ["http" => ["header" => "User-Agent: PHP\r\n"]];
+// Tambahkan timeout biar ga nunggu kelamaan kalau API BPS down
+$opts = ["http" => ["method" => "GET", "header" => "User-Agent: PHP\r\n", "timeout" => 5]];
 $context = stream_context_create($opts);
 $response = @file_get_contents($url, false, $context);
 
@@ -32,46 +29,24 @@ $rows = [];
 
 if ($response !== FALSE) {
     $data_bps = json_decode($response, true);
-    
-    // PERBAIKAN LOGIKA: Cek apakah indeks 'data' ada dan tidak kosong
-    // Kita cari secara dinamis di mana letak array kolom dan datanya
-    $main_data = null;
-    if (isset($data_bps['data']) && is_array($data_bps['data'])) {
-        foreach ($data_bps['data'] as $item_check) {
-            if (isset($item_check['kolom']) && isset($item_check['data'])) {
-                $main_data = $item_check;
-                break;
-            }
-        }
-    }
-
-    if ($main_data) {
-        $columns = $main_data['kolom'];
+    // Cek apakah data benar-benar ada
+    if (isset($data_bps['data'][1]['kolom'])) {
+        $columns = $data_bps['data'][1]['kolom'];
         $column_keys = [];
-
         foreach ($columns as $key => $col) {
             $headers[] = $col['nama_variabel'];
             $column_keys[] = $key;
         }
-
-        $raw_data = $main_data['data'];
-        foreach ($raw_data as $item) {
-            $row = [];
-            $row[] = $item['label'];
-            foreach ($column_keys as $key) {
-                // Gunakan null coalescing agar tidak error jika value tidak ada
-                $row[] = $item['variables'][$key]['value'] ?? "-";
+        foreach ($data_bps['data'][1]['data'] as $item) {
+            $row = [$item['label']];
+            foreach ($column_keys as $k) {
+                $row[] = $item['variables'][$k]['value'] ?? "-";
             }
             $rows[] = $row;
         }
-    } else {
-        $headers = ["Info"];
-        $rows = [["Struktur data API tidak sesuai atau sedang maintenance"]];
     }
-} else {
-    $headers = ["Error"];
-    $rows = [["Gagal terhubung ke server BPS"]];
 }
+?>
 
 <!DOCTYPE html>
 <html lang="id">
