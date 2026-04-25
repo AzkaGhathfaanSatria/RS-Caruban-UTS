@@ -1,28 +1,23 @@
 <?php
-// 1. Inisialisasi Output Buffering & Session (Wajib paling atas agar tidak blank)
-ob_start();
 session_set_cookie_params(0, '/');
 session_start();
-
-// 2. Sertakan koneksi (Ini yang tadi hilang, makanya blank karena variabel $koneksi tidak ada)
 require_once 'koneksi.php';
 
-// 3. Proteksi Halaman
-$role = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
+// Pastikan variabel session ada sebelum dicek
+$is_login = $_SESSION['login'] ?? false;
+$role     = isset($_SESSION['role']) ? strtolower(trim($_SESSION['role'])) : '';
 
-if (!isset($_SESSION['login']) || $role !== 'admin') {
+if (!$is_login || $role !== 'admin') {
     header("Location: /index.html");
     exit;
 }
 
-// 4. Hitung Statistik (Gunakan LOWER(TRIM()) agar akurat)
+// Query Statistik
 $total_user       = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user"));
 $total_admin      = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE LOWER(TRIM(role))='admin'"));
 $total_user_biasa = mysqli_num_rows(mysqli_query($koneksi, "SELECT * FROM user WHERE LOWER(TRIM(role))='user'"));
-
-$data_user = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
+$data_user        = mysqli_query($koneksi, "SELECT * FROM user ORDER BY role ASC");
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>

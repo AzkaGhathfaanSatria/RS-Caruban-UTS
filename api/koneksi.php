@@ -1,27 +1,30 @@
 <?php
-$host = 'gateway01.ap-southeast-1.prod.alicloud.tidbcloud.com';
-$port = 4000;
-$user = '3ZiKq6ZtEHR33K2.root';
-$pass = 'Sns4kG97NEXoBaRN';
-$db   = 'UTS-RSCaruban';
+session_set_cookie_params(0, '/');
+session_start();
+require_once 'koneksi.php';
 
-$koneksi = mysqli_init();
-mysqli_options($koneksi, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
-mysqli_ssl_set($koneksi, NULL, NULL, NULL, NULL, NULL);
+$email = mysqli_real_escape_string($koneksi, $_POST['email'] ?? '');
+$nik   = mysqli_real_escape_string($koneksi, $_POST['nik'] ?? '');
+$pass  = $_POST['password'] ?? '';
 
-$real_connect = mysqli_real_connect(
-    $koneksi, 
-    $host, 
-    $user, 
-    $pass, 
-    $db, 
-    $port,
-    NULL, 
-    MYSQLI_CLIENT_SSL
-);
+$sql = "SELECT * FROM user WHERE email='$email' AND nik='$nik' LIMIT 1";
+$query = mysqli_query($koneksi, $sql);
+$data = mysqli_fetch_assoc($query);
 
-if (!$real_connect) {
-    die("Koneksi Gagal");
+if ($data && password_verify($pass, $data['password'])) {
+    $_SESSION['login'] = true;
+    $_SESSION['email'] = $data['email'];
+    $_SESSION['role']  = strtolower(trim($data['role']));
+
+    // Simpan session secara permanen sebelum pindah halaman
+    session_write_close();
+
+    $target = ($_SESSION['role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+    
+    // Gunakan replace agar history browser bersih dan pindah instan
+    echo "<script>window.location.replace('/api/$target');</script>";
+    exit;
+} else {
+    echo "<script>alert('Login Gagal! Cek Email/NIK/Password'); window.location.replace('/index.html');</script>";
+    exit;
 }
-// JANGAN ADA ECHO ATAU TEXT DI SINI
-?>
