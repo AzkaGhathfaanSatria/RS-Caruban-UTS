@@ -1,30 +1,38 @@
 <?php
+ob_start();
 session_start();
 include 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// Metode pengecekan persis dashboard user (Anti-Mental)
-if (!isset($_SESSION['login']) || $_SESSION['role'] != 'admin') {
-    header("Location: login.php");
-    exit;
+/** * SINRONISASI SESSION & COOKIE
+ * Supaya kalau session hilang, bisa ambil dari cookie (Vercel Friendly)
+ */
+if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
+    $_SESSION['login'] = true;
+    $_SESSION['role']  = $_COOKIE['user_role'];
+    $_SESSION['email'] = $_COOKIE['user_email'];
 }
 
-// 1. Ambil data user sekaligus (Efisien: Cukup 1 Query Utama)
-$data_user = mysqli_query($conn, "SELECT * FROM user ORDER BY role ASC");
-$total_user = mysqli_num_rows($data_user);
+// Cek Keamanan: Harus Login & Harus Admin
+$role_check = $_SESSION['role'] ?? '';
+if (!isset($_SESSION['login']) || $role_check !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
 
-// 2. Hitung statistik dari hasil query (Lebih cepat daripada bolak-balik ke DB)
+// Ambil data (Query Ringkas)
+$data_user = mysqli_query($conn, "SELECT * FROM user ORDER BY role ASC");
+$users_array = [];
 $total_admin = 0;
 $total_user_biasa = 0;
-$users_array = [];
 
 while ($row = mysqli_fetch_assoc($data_user)) {
     $users_array[] = $row;
     if ($row['role'] == 'admin') $total_admin++;
     else $total_user_biasa++;
 }
+$total_user = count($users_array);
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
