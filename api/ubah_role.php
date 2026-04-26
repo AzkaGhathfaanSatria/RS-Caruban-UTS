@@ -3,28 +3,31 @@ session_start();
 include 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// 1. KEAMANAN: Cek apakah yang akses beneran Admin
-if (!isset($_SESSION['login']) || $_SESSION['role'] != 'admin') {
-    die("Akses ditolak!");
+// --- PROTEKSI HYBRID (Cek Session + Cookie) ---
+if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
+    $_SESSION['login'] = true;
+    $_SESSION['role']  = $_COOKIE['user_role'];
+    $_SESSION['email'] = $_COOKIE['user_email'];
 }
 
-// 2. AMBIL ID & VALIDASI
-$id = mysqli_real_escape_string($conn, $_GET['id']);
+$role_check = $_SESSION['role'] ?? '';
+if (!isset($_SESSION['login']) || $role_check !== 'admin') {
+    die("Akses ditolak! Anda tidak memiliki izin mengubah role.");
+}
+// ----------------------------------------------
+
+$id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : '';
 
 if (!empty($id)) {
-    // 3. AMBIL ROLE SAAT INI (Cukup ambil kolom role saja agar ringan)
     $query = mysqli_query($conn, "SELECT role FROM user WHERE id='$id'");
     $data  = mysqli_fetch_assoc($query);
 
     if ($data) {
-        // 4. LOGIKA TOGGLE (Tukar Role)
         $new_role = ($data['role'] == 'admin') ? 'user' : 'admin';
-
-        // 5. UPDATE KE DATABASE
         mysqli_query($conn, "UPDATE user SET role='$new_role' WHERE id='$id'");
     }
 }
 
-// 6. KEMBALI KE DASHBOARD
 header("Location: admin_dashboard.php");
 exit();
+?>
