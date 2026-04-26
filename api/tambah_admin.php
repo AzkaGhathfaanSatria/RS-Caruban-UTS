@@ -1,21 +1,24 @@
 <?php
 session_start();
-include 'koneksi.php';
+require_once 'koneksi.php'; // Pastikan file koneksi ada di folder yang sama
 
-// Proteksi halaman: Hanya admin yang boleh masuk
-if (!isset($_SESSION['login']) || $_SESSION['role'] != 'admin') {
+// 1. PROTEKSI SUPER KETAT (Hybrid Session & Cookie)
+$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
+$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+
+// Jika tidak login ATAU role bukan admin, lempar ke login
+if (!$isLogin || $role !== 'admin') {
     header("Location: login.php");
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrasi Staf | RS Caruban</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
