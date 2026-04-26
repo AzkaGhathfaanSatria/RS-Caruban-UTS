@@ -1,21 +1,20 @@
 <?php
 session_start();
-require_once(dirname(__FILE__) . '/koneksi.php'); // Menggunakan path yang lebih aman
+require_once 'koneksi.php';
+$conn = $koneksi ?? $conn;
 
-// 1. Proteksi Login (Sistem Hybrid Session + Cookie)
+// 1. Proteksi Login Hybrid
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
-$email_user_login = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
+$email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
 
-// Jika tidak login atau bukan user, tendang ke login.php
 if (!$isLogin || $role !== 'user') {
     header("Location: login.php");
     exit();
 }
 
-// 2. Ambil data (Gunakan variabel koneksi yang ada di koneksi.php kamu, biasanya $conn atau $koneksi)
-// Saya asumsikan $conn sesuai standar kita sebelumnya, jika namannya $koneksi silakan sesuaikan.
-$query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_login' ORDER BY id DESC");
+// 2. Ambil data riwayat berdasarkan email user
+$query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email' ORDER BY id DESC");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -23,7 +22,7 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_logi
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Saya | RS Caruban</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
@@ -32,12 +31,8 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_logi
 
 <nav class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-2 font-black tracking-tighter text-blue-600">
-            <span class="uppercase">RS Caruban</span>
-        </div>
-        <a href="/api/dashboard.php" class="text-xs font-bold bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 hover:bg-blue-600 hover:text-white transition-all">
-            Dashboard
-        </a>
+        <div class="flex items-center gap-2 font-black tracking-tighter text-blue-600 uppercase">RS Caruban</div>
+        <a href="dashboard.php" class="text-xs font-bold bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 hover:bg-blue-600 hover:text-white transition-all">Dashboard</a>
     </div>
 </nav>
 
@@ -49,14 +44,12 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_logi
     </header>
 
     <div class="bg-white border border-slate-100 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 overflow-hidden">
-        
         <?php if (mysqli_num_rows($query) == 0) : ?>
             <div class="py-24 text-center">
                 <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum Ada Riwayat</p>
-                <a href="/api/pendaftaran.php" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 transition-all active:scale-95">Daftar Sekarang</a>
+                <a href="pendaftaran.php" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-100 transition-all active:scale-95">Daftar Sekarang</a>
             </div>
         <?php else : ?>
-
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -71,21 +64,15 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email_user_logi
                         <?php while ($data = mysqli_fetch_assoc($query)) : ?>
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="px-8 py-6">
-                                    <div class="font-bold text-sm"><?php echo htmlspecialchars($data['nama']); ?></div>
-                                    <div class="text-[10px] text-slate-400 font-mono italic">NIK: <?php echo htmlspecialchars($data['nik']); ?></div>
+                                    <div class="font-bold text-sm"><?= htmlspecialchars($data['nama']) ?></div>
+                                    <div class="text-[10px] text-slate-400 font-mono italic">NIK: <?= htmlspecialchars($data['nik']) ?></div>
                                 </td>
                                 <td class="px-8 py-6 text-center">
-                                    <span class="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase">
-                                        <?php echo $data['poli']; ?>
-                                    </span>
+                                    <span class="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase"><?= $data['poli'] ?></span>
                                 </td>
-                                <td class="px-8 py-6 text-xs font-semibold text-slate-600 italic">
-                                    <?php echo $data['dokter']; ?>
-                                </td>
+                                <td class="px-8 py-6 text-xs font-semibold text-slate-600 italic"><?= $data['dokter'] ?></td>
                                 <td class="px-8 py-6 text-center">
-                                    <span class="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase border border-emerald-100">
-                                        Terverifikasi
-                                    </span>
+                                    <span class="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase border border-emerald-100">Terverifikasi</span>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
