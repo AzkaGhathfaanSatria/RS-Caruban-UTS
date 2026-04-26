@@ -1,17 +1,24 @@
 <?php
+ob_start();
 session_start();
-require_once 'koneksi.php'; // Pastikan file koneksi ada di folder yang sama
+require_once 'koneksi.php';
+$conn = $koneksi ?? $conn;
 
-// 1. PROTEKSI SUPER KETAT (Hybrid Session & Cookie)
-$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
-$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+// 1. SINKRONISASI SESSION & COOKIE (Sesuai kode Admin Dashboard kamu)
+if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
+    $_SESSION['login'] = true;
+    $_SESSION['role']  = $_COOKIE['user_role'];
+    $_SESSION['email'] = $_COOKIE['user_email'];
+}
 
-// Jika tidak login ATAU role bukan admin, lempar ke login
-if (!$isLogin || $role !== 'admin') {
+// 2. CEK KEAMANAN: Harus Login & Harus Admin
+$role_check = $_SESSION['role'] ?? '';
+if (!isset($_SESSION['login']) || $role_check !== 'admin') {
     header("Location: login.php");
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -20,7 +27,9 @@ if (!$isLogin || $role !== 'admin') {
     <title>Registrasi Staf | RS Caruban</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
 
 <body class="bg-[#fcfcfd] min-h-screen flex flex-col justify-center items-center p-6 antialiased">
@@ -78,3 +87,5 @@ if (!$isLogin || $role !== 'admin') {
 
 </body>
 </html>
+
+<?php ob_end_flush(); ?>
