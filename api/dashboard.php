@@ -4,6 +4,7 @@ session_start();
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
 $email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? 'User';
+$nama    = $_SESSION['nama_akun'] ?? $_COOKIE['user_nama'] ?? 'Pasien';
 
 if (!$isLogin || $role !== 'user') {
     header("Location: login.php");
@@ -68,7 +69,7 @@ if (isset($data_bps['data'][1])) {
         <div class="flex items-center gap-3 md:gap-4 pl-1 md:pl-2">
             <div class="h-9 w-9 md:h-10 md:w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200 text-sm">C</div>
             <div class="overflow-hidden">
-                <h1 class="text-sm md:text-lg font-bold text-slate-800 leading-none truncate">Halo, Pasien</h1>
+                <h1 class="text-sm md:text-lg font-bold text-slate-800 leading-none truncate">Halo, <?= htmlspecialchars($nama) ?></h1>
                 <p class="text-slate-500 text-[10px] md:text-xs mt-1 font-medium opacity-80 truncate"><?= htmlspecialchars($email) ?></p>
             </div>
         </div>

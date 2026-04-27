@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($query && mysqli_num_rows($query) > 0) {
         $data = mysqli_fetch_assoc($query);
 
-
         if (password_verify($password, $data['password'])) {
             $_SESSION['login'] = true;
             $_SESSION['role']  = $data['role'];
