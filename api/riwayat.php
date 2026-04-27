@@ -24,7 +24,6 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email' ORDER BY
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        /* Trick untuk menyembunyikan header tabel di mobile dan menampilkannya di desktop */
         @media (max-width: 768px) {
             .responsive-table thead { display: none; }
             .responsive-table tr { 
@@ -82,6 +81,7 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email' ORDER BY
                 <table class="w-full text-left border-collapse responsive-table">
                     <thead>
                         <tr class="bg-slate-50/50 border-b border-slate-100">
+                            <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu Daftar</th>
                             <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pasien</th>
                             <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Poli</th>
                             <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Dokter</th>
@@ -91,6 +91,17 @@ $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email' ORDER BY
                     <tbody class="divide-y divide-slate-50 md:bg-transparent">
                         <?php while ($data = mysqli_fetch_assoc($query)) : ?>
                             <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-8 py-6" data-label="Waktu Daftar">
+                                    <div class="flex flex-col items-end md:items-start">
+                                        <div class="font-bold text-xs text-blue-600">
+                                            <?= date('d M Y', strtotime($data['tanggal'])) ?>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 font-medium">
+                                            <?= date('H:i', strtotime($data['tanggal'])) ?> WIB
+                                        </div>
+                                    </div>
+                                </td>
+
                                 <td class="px-8 py-6" data-label="Pasien">
                                     <div class="flex flex-col items-end md:items-start">
                                         <div class="font-bold text-sm text-slate-800"><?= htmlspecialchars($data['nama']) ?></div>
