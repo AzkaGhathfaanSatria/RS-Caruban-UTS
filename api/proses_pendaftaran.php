@@ -14,11 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $poli       = mysqli_real_escape_string($conn, $_POST['poli']);
     $dokter     = mysqli_real_escape_string($conn, $_POST['dokter']);
 
-    // Data dari Akun Login
     $nama_akun = $_SESSION['nama_akun'] ?? $_COOKIE['user_nama'] ?? '';
     $nik_akun  = $_SESSION['nik_akun'] ?? $_COOKIE['user_nik'] ?? '';
 
-    // Validasi Double-Lock
     if (strtolower($nama_input) !== strtolower($nama_akun) || $nik_input !== $nik_akun) {
         echo "<script>alert('Gagal! Nama dan NIK harus sesuai akun Anda.'); window.history.back();</script>";
         exit();

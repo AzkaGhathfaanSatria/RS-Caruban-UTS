@@ -1,7 +1,6 @@
 <?php 
 session_start(); 
 
-// Cek jika sudah login (via Session atau Cookie)
 if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true')) {
     $role = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
     header("Location: " . ($role === 'admin' ? "admin_dashboard.php" : "dashboard.php"));
