@@ -32,13 +32,6 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
             <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
             <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
         </div>
-
-        <?php if(isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-4 rounded-full text-[10px] font-black uppercase tracking-widest text-center mb-6 shadow-sm">
-                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-            </div>
-        <?php endif; ?>
-
         <form method="POST" action="proses_login.php" class="space-y-4 md:space-y-5">
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
