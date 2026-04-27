@@ -1,13 +1,13 @@
 <?php 
 session_start(); 
 
+// Redirect jika sudah login
 if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true')) {
     $role = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
     header("Location: " . ($role === 'admin' ? "admin_dashboard.php" : "dashboard.php"));
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -18,6 +18,8 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#3b82f615 0.5px, #f0f9ff 0.5px) 0 0/30px 30px; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
@@ -34,7 +36,7 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
         </div>
 
         <?php if(isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-center mb-6">
+            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center mb-6 animate-fade-in">
                 <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
@@ -42,15 +44,15 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
         <form method="POST" action="proses_login.php" class="space-y-4 md:space-y-5">
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
-                <input type="email" name="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
+                <input type="email" name="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">NIK (16 Digit)</label>
-                <input type="text" name="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm">
+                <input type="text" name="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm text-slate-700">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Kata Sandi</label>
-                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
+                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
             </div>
             <button type="submit" class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
                 Masuk ke Sistem

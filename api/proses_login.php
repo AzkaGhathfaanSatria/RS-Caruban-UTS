@@ -1,9 +1,8 @@
 <?php
-ob_start();
 session_start();
 require_once(dirname(__FILE__) . '/koneksi.php');
 
-// Pastikan koneksi menggunakan variabel yang benar ($conn atau $koneksi)
+// Pastikan koneksi menggunakan variabel yang benar
 $db = isset($conn) ? $conn : $koneksi;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -11,42 +10,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nik = mysqli_real_escape_string($db, $_POST['nik']);
     $password = $_POST['password'];
 
+    // Cari user berdasarkan email DAN nik
     $sql = "SELECT * FROM user WHERE email='$email' AND nik='$nik' LIMIT 1";
     $query = mysqli_query($db, $sql);
 
     if ($query && mysqli_num_rows($query) > 0) {
         $data = mysqli_fetch_assoc($query);
 
+        // Verifikasi Password
         if (password_verify($password, $data['password'])) {
             // 1. Simpan di Session
             $_SESSION['login'] = true;
-            $_SESSION['role']  = $data['role']; // Pastikan di DB isinya 'admin' atau 'user'
+            $_SESSION['role']  = $data['role'];
             $_SESSION['email'] = $data['email'];
 
-            // 2. Simpan di Cookie (PENTING: Gunakan path "/" agar terbaca di semua folder)
-            $expiry = time() + (7200); // Kita buat 2 jam biar nggak gampang logout
+            // 2. Simpan di Cookie (Aktif 2 jam)
+            $expiry = time() + (7200);
             setcookie('user_login', 'true', $expiry, "/");
             setcookie('user_role', $data['role'], $expiry, "/");
             setcookie('user_email', $data['email'], $expiry, "/");
 
-            // Tutup session agar tersimpan permanen sebelum redirect
+            // Tutup session agar tersimpan sebelum redirect
             session_write_close();
 
-            // Tentukan target redirect
+            // Redirect sesuai role
             $target = ($data['role'] == 'admin') ? "admin_dashboard.php" : "dashboard.php";
-            
-            echo "<script>window.location.href='$target';</script>";
+            header("Location: $target");
             exit();
         } else {
-            $_SESSION['error'] = "Password salah!";
-            header("Location: login.php"); // Ganti JS dengan ini
-        exit();
+            // Password Salah
+            $_SESSION['error'] = "Kata sandi yang Anda masukkan salah!";
+            session_write_close();
+            header("Location: login.php");
+            exit();
         }
     } else {
+        // Akun Tidak Ditemukan
         $_SESSION['error'] = "Email atau NIK tidak terdaftar!";
+        session_write_close();
         header("Location: login.php");
         exit();
     }
 }
-ob_end_flush();
 ?>
