@@ -1,13 +1,13 @@
 <?php 
 session_start(); 
 
-// Logika Redirect Otomatis
 if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true')) {
     $role = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
     header("Location: " . ($role === 'admin' ? "admin_dashboard.php" : "dashboard.php"));
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

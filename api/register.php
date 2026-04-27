@@ -53,7 +53,7 @@
 
             <div class="md:col-span-2 relative">
                 <label class="block text-[10px] font-black text-green-600 uppercase tracking-widest mb-1.5 ml-1">Password</label>
-                <input type="password" name="password" id="password" required placeholder="Min. 8 Karakter" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
+                <input type="password" name="password" id="password" required placeholder="Password 8-16 karakter" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
                 <button type="button" onclick="togglePassword()" class="absolute right-4 top-10 text-slate-400 hover:text-green-600">
                     <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -92,7 +92,7 @@ function validasi() {
     let nik = document.getElementById("nik").value;
     let password = document.getElementById("password").value;
     if (nik.length !== 16 || isNaN(nik)) { showNotif("NIK harus 16 digit angka!", "error"); return false; }
-    if (password.length < 8) { showNotif("Password minimal 8 karakter!", "error"); return false; }
+    if (password.length < 8 || password.length > 16) { showNotif("Password harus antara 8-16 karakter!", "error"); return false; }
     return true;
 }
 

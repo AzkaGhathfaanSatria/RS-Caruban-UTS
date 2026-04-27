@@ -39,11 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         } else {
             $_SESSION['error'] = "Password salah!";
-            echo "<script>window.location.href='login.php';</script>";
+            header("Location: login.php"); // Ganti JS dengan ini
+        exit();
         }
     } else {
         $_SESSION['error'] = "Email atau NIK tidak terdaftar!";
-        echo "<script>window.location.href='login.php';</script>";
+        header("Location: login.php");
+        exit();
     }
 }
 ob_end_flush();
