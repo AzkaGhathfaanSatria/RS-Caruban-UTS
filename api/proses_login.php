@@ -2,7 +2,7 @@
 session_start();
 require_once(dirname(__FILE__) . '/koneksi.php');
 
-// Pastikan koneksi menggunakan variabel yang benar
+// Menentukan variabel koneksi (pastikan sesuai dengan file koneksi.php kamu)
 $db = isset($conn) ? $conn : $koneksi;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             setcookie('user_role', $data['role'], $expiry, "/");
             setcookie('user_email', $data['email'], $expiry, "/");
 
-            // Tutup session agar tersimpan sebelum redirect
             session_write_close();
 
             // Redirect sesuai role
@@ -38,15 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header("Location: $target");
             exit();
         } else {
-            // Password Salah
-            $_SESSION['error'] = "Kata sandi yang Anda masukkan salah!";
+            // PESAN DISESUAIKAN UNTUK KAPSUL (Lebih padat)
+            $_SESSION['error'] = "KATA SANDI SALAH!";
             session_write_close();
             header("Location: login.php");
             exit();
         }
     } else {
-        // Akun Tidak Ditemukan
-        $_SESSION['error'] = "Email atau NIK tidak terdaftar!";
+        // PESAN DISESUAIKAN UNTUK KAPSUL
+        $_SESSION['error'] = "EMAIL ATAU NIK TIDAK TERDAFTAR!";
         session_write_close();
         header("Location: login.php");
         exit();
