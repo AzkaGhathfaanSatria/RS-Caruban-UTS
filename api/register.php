@@ -7,22 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(#22c55e10 0.5px, #f0fdf4 0.5px) 0 0/20px 20px; 
-            overflow-x: hidden;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#22c55e10 0.5px, #f0fdf4 0.5px) 0 0/20px 20px; }
     </style>
 </head>
-
 <body class="min-h-screen flex flex-col antialiased">
+
 <div class="flex justify-center items-center flex-grow p-4 md:p-6">
     <div class="bg-white/90 backdrop-blur-md border border-slate-100 p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-green-900/5 w-full max-w-lg">
 
         <div class="text-center mb-6 md:mb-8">
-            <div class="inline-flex p-3 bg-green-50 rounded-2xl mb-4">
-                <img src="RSCaruban.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="Logo">
-            </div>
+            <a href="../index.html" class="inline-flex p-3 bg-green-50 rounded-2xl mb-4 hover:scale-105 transition-transform">
+                <img src="../RSCaruban.png" class="w-10 h-10 object-contain" alt="Logo">
+            </a>
             <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Buat Akun</h1>
             <p class="text-slate-500 text-xs md:text-sm font-medium mt-2">Daftar untuk akses layanan digital</p>
         </div>
@@ -32,34 +28,34 @@
         <form method="POST" action="proses_register.php" onsubmit="return validasi()" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Alamat Email</label>
-                <input type="email" name="email" id="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-slate-700 transition-all text-sm">
+                <input type="email" name="email" id="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
 
             <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nama Lengkap</label>
-                <input type="text" name="nama" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-slate-700 transition-all text-sm">
+                <input type="text" name="nama" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
 
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">NIK</label>
-                <input type="text" name="nik" id="nik" required inputmode="numeric" placeholder="16 Digit" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-mono text-sm transition-all">
+                <input type="text" name="nik" id="nik" required inputmode="numeric" placeholder="16 Digit" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-mono text-sm transition-all">
             </div>
 
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">WhatsApp</label>
-                <input type="tel" name="no_hp" required placeholder="0812..." class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium transition-all text-sm">
+                <input type="tel" name="no_hp" required placeholder="0812..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
 
             <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Domisili</label>
-                <textarea name="alamat" required placeholder="Alamat lengkap..." rows="2" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium transition-all resize-none text-sm"></textarea>
+                <textarea name="alamat" required placeholder="Alamat lengkap..." rows="2" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium transition-all resize-none text-sm"></textarea>
             </div>
 
             <div class="md:col-span-2 relative">
                 <label class="block text-[10px] font-black text-green-600 uppercase tracking-widest mb-1.5 ml-1">Password</label>
-                <input type="password" name="password" id="password" required placeholder="Min. 8 Karakter" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium transition-all text-sm">
-                <button type="button" onclick="togglePassword()" class="absolute right-4 top-9 md:top-10 text-slate-400 hover:text-green-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <input type="password" name="password" id="password" required placeholder="Min. 8 Karakter" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
+                <button type="button" onclick="togglePassword()" class="absolute right-4 top-10 text-slate-400 hover:text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                 </button>
@@ -67,23 +63,22 @@
 
             <input type="hidden" name="role" value="user">
 
-            <button class="md:col-span-2 w-full bg-green-600 text-white p-4 md:p-5 mt-2 md:mt-4 rounded-[1.5rem] md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-green-700 shadow-xl shadow-green-100 active:scale-95 transition-all">
+            <button class="md:col-span-2 w-full bg-green-600 text-white p-5 mt-4 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-green-700 shadow-xl shadow-green-100 active:scale-95 transition-all">
                 Konfirmasi Pendaftaran
             </button>
         </form>
 
-        <div class="mt-6 md:mt-8 pt-6 border-t border-slate-50 text-center">
+        <div class="mt-8 pt-6 border-t border-slate-50 text-center">
             <p class="text-xs md:text-sm font-medium text-slate-500">Sudah punya akun? <a href="login.php" class="text-green-600 font-bold hover:underline">Login di sini</a></p>
         </div>
     </div>
 </div>
 
-<footer class="py-6 text-center bg-white/50 border-t border-slate-100">
+<footer class="py-6 text-center">
     <p class="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">© 2026 RS CARUBAN</p>
 </footer>
 
 <script>
-// Logic JavaScript tetap sama karena sudah stabil
 function showNotif(pesan, tipe) {
     let notif = document.getElementById("notif");
     notif.className = "text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-2xl mb-6 border transition-all " + 
