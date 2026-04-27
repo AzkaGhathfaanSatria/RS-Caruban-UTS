@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['email'] = $data['email'];
 
             // 2. Simpan di Cookie (PENTING: Gunakan path "/" agar terbaca di semua folder)
-            $expiry = time() + (86400 * 7); // Kita buat 7 hari biar nggak gampang logout
+            $expiry = time() + (7200); // Kita buat 2 jam biar nggak gampang logout
             setcookie('user_login', 'true', $expiry, "/");
             setcookie('user_role', $data['role'], $expiry, "/");
             setcookie('user_email', $data['email'], $expiry, "/");
