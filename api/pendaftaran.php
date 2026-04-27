@@ -1,9 +1,11 @@
-<?php 
-session_start(); 
+<?php
+session_start();
 
-if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true')) {
-    $role = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
-    header("Location: " . ($role === 'admin' ? "admin_dashboard.php" : "dashboard.php"));
+$isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
+$role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
+
+if (!$isLogin || $role !== 'user') {
+    header("Location: login.php");
     exit();
 }
 ?>
@@ -12,103 +14,132 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login | RS Caruban</title>
+    <title>Pendaftaran Pasien | RS Caruban</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#3b82f615 0.5px, #f0f9ff 0.5px) 0 0/30px 30px; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(#3b82f605 0.5px, #f8fafc 0.5px) 0 0/24px 24px; 
+            overflow-x: hidden;
+        }
+        /* Menghilangkan panah default select di beberapa browser agar seragam */
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="text-slate-900 min-h-screen flex flex-col antialiased">
 
-<div class="flex justify-center items-center flex-grow p-4 md:p-6">
-    <div class="bg-white/95 backdrop-blur-xl border border-slate-100 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-blue-900/10 w-full max-w-md">
-        
-        <div class="text-center mb-8 md:mb-10">
-            <a href="../index.html" class="inline-flex p-3 md:p-4 bg-blue-50 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-inner hover:scale-105 transition-transform">
-                <img src="../RSCaruban.png" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
-            </a>
-            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
-            <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
-        </div>
-
-        <div id="notif" class="<?php echo isset($_SESSION['error']) ? '' : 'hidden'; ?> text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-2xl mb-6 border transition-all <?php echo isset($_SESSION['error']) ? 'bg-red-50 text-red-600 border-red-100' : ''; ?>">
-            <?php 
-                if(isset($_SESSION['error'])) { 
-                    echo $_SESSION['error']; 
-                    unset($_SESSION['error']); 
-                } 
-            ?>
-        </div>
-
-        <form method="POST" action="proses_login.php" onsubmit="return validasiLogin()" class="space-y-4 md:space-y-5">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
-                <input type="email" name="email" id="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
+<div class="max-w-4xl mx-auto p-4 md:p-8 w-full flex-1">
+    <div class="mb-6 md:mb-8">
+        <a href="dashboard.php" class="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-all font-bold text-xs md:text-sm group">
+            <div class="p-2 bg-white rounded-xl shadow-sm border border-slate-100 group-hover:bg-blue-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
             </div>
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">NIK (16 Digit)</label>
-                <input type="text" name="nik" id="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm text-slate-700">
-            </div>
-            <div class="relative">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Kata Sandi</label>
-                <input type="password" name="password" id="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
-                <button type="button" onclick="togglePassword()" class="absolute right-4 top-10 text-slate-400 hover:text-blue-600 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </button>
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
-                Masuk ke Sistem
-            </button>
-        </form>
+            Kembali
+        </a>
+    </div>
 
-        <div class="mt-8 md:mt-10 pt-6 border-t border-slate-50 text-center">
-            <p class="text-xs md:text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
+    <div class="bg-white border border-slate-100 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-blue-900/5 overflow-hidden">
+        <div class="h-2 bg-gradient-to-r from-blue-600 to-emerald-500"></div>
+
+        <div class="p-6 md:p-12">
+            <header class="mb-8 md:mb-10 text-center md:text-left">
+                <span class="bg-blue-50 text-blue-600 text-[9px] md:text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest italic">Layanan Mandiri</span>
+                <h1 class="text-2xl md:text-3xl font-black text-slate-800 mt-4 tracking-tight">Pendaftaran Pasien</h1>
+                <p class="text-slate-500 font-medium text-xs md:text-sm mt-1">Lengkapi form untuk mendapatkan nomor antrean.</p>
+            </header>
+
+            <form method="POST" action="proses_pendaftaran.php" class="space-y-5 md:space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nama Pasien</label>
+                        <input type="text" name="nama" required placeholder="Nama Lengkap" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">NIK (16 Digit)</label>
+                        <input type="text" name="nik" required inputmode="numeric" placeholder="NIK Pasien" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">No. WhatsApp</label>
+                        <input type="tel" name="no_hp" required placeholder="08xxx" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pt-4">
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Poli Tujuan</label>
+                        <select name="poli" id="poli" onchange="updateDokter()" required class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white outline-none font-bold text-slate-700 cursor-pointer text-sm">
+                            <option value="" disabled selected>Pilih Poliklinik...</option>
+                            <option value="Poli Umum">Poli Umum</option>
+                            <option value="Poli Gigi">Poli Gigi</option>
+                            <option value="Poli Anak">Poli Anak</option>
+                            <option value="Poli Jantung">Poli Jantung</option>
+                        </select>
+                        <div class="absolute right-4 top-[38px] pointer-events-none text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1.5 ml-1">Dokter Spesialis</label>
+                        <select name="dokter" id="dokter" required class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white outline-none font-bold text-slate-700 cursor-pointer text-sm">
+                            <option value="" disabled selected>Pilih Poli Dahulu...</option>
+                        </select>
+                        <div class="absolute right-4 top-[38px] pointer-events-none text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 md:pt-8">
+                    <button type="submit" class="w-full bg-slate-900 text-white p-4 md:p-5 rounded-2xl md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3">
+                        Daftar Sekarang
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                    <p class="text-center text-[9px] text-slate-400 mt-4 font-bold uppercase tracking-widest">Estimasi antrean akan dikirim via WhatsApp</p>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<footer class="py-6 text-center">
-    <p class="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">© 2026 RS CARUBAN</p>
+<footer class="py-8 text-center">
+    <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">SISTEM RS CARUBAN • © 2026</p>
 </footer>
 
 <script>
-function showNotif(pesan, tipe) {
-    let notif = document.getElementById("notif");
-    notif.className = "text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-2xl mb-6 border transition-all " + 
-                     (tipe === "error" ? "bg-red-50 text-red-600 border-red-100" : "bg-blue-50 text-blue-600 border-blue-100");
-    notif.innerText = pesan;
-    notif.classList.remove("hidden");
-}
+// Data Dokter per Poli
+const dataDokter = {
+    "Poli Umum": ["Dr. Dante Sp.PD", "Dr. Vergil Sp.PD", "Dr. Nero Sp.PD"],
+    "Poli Gigi": ["Drg. Leon", "Drg. Chris", "Drg. Ethan"],
+    "Poli Anak": ["Dr. Joel Sp.A", "Dr. Ellie Sp.A", "Dr. Tommy Sp.A"],
+    "Poli Jantung": ["Dr. Morgana Sp.JP", "Dr. Koromaru Sp.JP", "Dr. Teddie Sp.JP"]
+};
 
-function validasiLogin() {
-    let nik = document.getElementById("nik").value;
-    let password = document.getElementById("password").value;
+function updateDokter() {
+    const poliSelect = document.getElementById('poli');
+    const dokterSelect = document.getElementById('dokter');
+    const poliTerpilih = poliSelect.value;
 
-    if (nik.length !== 16 || isNaN(nik)) {
-        showNotif("NIK harus 16 digit angka!", "error");
-        return false;
-    }
-    if (password.length < 8) {
-        showNotif("Password minimal 8 karakter!", "error");
-        return false;
-    }
-    return true;
-}
+    dokterSelect.innerHTML = '<option value="" disabled selected>Pilih Dokter...</option>';
 
-function togglePassword() {
-    let pw = document.getElementById("password");
-    let icon = document.getElementById("eye-icon");
-    if (pw.type === "password") {
-        pw.type = "text";
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.253 0 2.426.235 3.525.657m-8.69 8.69a3 3 0 004.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />';
-    } else {
-        pw.type = "password";
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+    if (dataDokter[poliTerpilih]) {
+        dataDokter[poliTerpilih].forEach(dokter => {
+            let option = document.createElement('option');
+            option.value = dokter;
+            option.text = dokter;
+            dokterSelect.add(option);
+        });
     }
 }
 </script>
+
 </body>
 </html>
