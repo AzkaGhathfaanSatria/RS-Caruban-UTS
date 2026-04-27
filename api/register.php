@@ -21,7 +21,7 @@
 
         <div class="text-center mb-6 md:mb-8">
             <div class="inline-flex p-3 bg-green-50 rounded-2xl mb-4">
-                <img src="RSCaruban" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="Logo">
+                <img src="RSCaruban.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Buat Akun</h1>
             <p class="text-slate-500 text-xs md:text-sm font-medium mt-2">Daftar untuk akses layanan digital</p>

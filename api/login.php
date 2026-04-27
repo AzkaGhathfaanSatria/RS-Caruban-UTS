@@ -28,7 +28,7 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
         
         <div class="text-center mb-8 md:mb-10">
             <div class="inline-flex p-3 md:p-4 bg-blue-50 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-inner">
-                <img src="RSCaruban" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
+                <img src="RSCaruban.png" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
             </div>
             <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
             <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
