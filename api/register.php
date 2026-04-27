@@ -94,7 +94,7 @@ function validasi() {
     let password = document.getElementById("password").value;
     
     if (nik.length !== 16) { showNotif("NIK harus tepat 16 digit!", "error"); return false; }
-    if (no_hp.length < 10) { showNotif("Nomor WhatsApp tidak valid!", "error"); return false; }
+    if (no_hp.length < 12 || no_hp.length > 13) { showNotif("Nomor WhatsApp tidak valid!", "error"); return false; }
     if (password.length < 8 || password.length > 16) { showNotif("Password harus antara 8-16 karakter!", "error"); return false; }
     return true;
 }

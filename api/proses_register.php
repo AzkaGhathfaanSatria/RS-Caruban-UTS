@@ -17,14 +17,13 @@ $no_hp    = mysqli_real_escape_string($koneksi, trim($_POST['no_hp']));
 $alamat   = mysqli_real_escape_string($koneksi, trim($_POST['alamat']));
 $role     = 'user';
 
-// Cek angka saja untuk NIK dan No HP
 if (!ctype_digit($nik) || strlen($nik) != 16) {
     echo "<script>alert('NIK harus 16 digit angka!'); window.history.back();</script>";
     exit;
 }
 
-if (!ctype_digit($no_hp)) {
-    echo "<script>alert('Nomor HP hanya boleh berisi angka!'); window.history.back();</script>";
+if (!ctype_digit($no_hp) || strlen($no_hp) < 12 || strlen($no_hp) > 13) {
+    echo "<script>alert('Nomor WhatsApp tidak valid!'); window.history.back();</script>";
     exit;
 }
 
