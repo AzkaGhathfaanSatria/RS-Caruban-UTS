@@ -17,8 +17,14 @@ $no_hp    = mysqli_real_escape_string($koneksi, trim($_POST['no_hp']));
 $alamat   = mysqli_real_escape_string($koneksi, trim($_POST['alamat']));
 $role     = 'user';
 
-if (strlen($nik) != 16) {
-    echo "<script>alert('NIK harus 16 digit!'); window.history.back();</script>";
+// Cek angka saja untuk NIK dan No HP
+if (!ctype_digit($nik) || strlen($nik) != 16) {
+    echo "<script>alert('NIK harus 16 digit angka!'); window.history.back();</script>";
+    exit;
+}
+
+if (!ctype_digit($no_hp)) {
+    echo "<script>alert('Nomor HP hanya boleh berisi angka!'); window.history.back();</script>";
     exit;
 }
 
@@ -36,9 +42,9 @@ if (mysqli_num_rows($query_cek) > 0) {
     if ($data_ada['email'] == $email) {
         $pesan = "Email sudah terdaftar!";
     } else if ($data_ada['nik'] == $nik) {
-        $pesan = "NIK sudah terdaftar! Gunakan NIK Anda sendiri.";
+        $pesan = "NIK sudah terdaftar!";
     } else if ($data_ada['no_hp'] == $no_hp) {
-        $pesan = "Nomor WhatsApp sudah digunakan akun lain!";
+        $pesan = "Nomor WhatsApp sudah digunakan!";
     }
     
     echo "<script>alert('$pesan'); window.history.back();</script>";

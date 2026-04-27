@@ -37,13 +37,13 @@
             </div>
 
             <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">NIK</label>
-                <input type="text" name="nik" id="nik" required inputmode="numeric" placeholder="16 Digit" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-mono text-sm transition-all">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">NIK (16 Digit)</label>
+                <input type="text" name="nik" id="nik" required maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')" inputmode="numeric" placeholder="16 Digit" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-mono text-sm transition-all">
             </div>
 
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">WhatsApp</label>
-                <input type="tel" name="no_hp" required placeholder="0812..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
+                <input type="text" name="no_hp" id="no_hp" required maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="0812..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
 
             <div class="md:col-span-2">
@@ -90,8 +90,11 @@ function showNotif(pesan, tipe) {
 
 function validasi() {
     let nik = document.getElementById("nik").value;
+    let no_hp = document.getElementById("no_hp").value;
     let password = document.getElementById("password").value;
-    if (nik.length !== 16 || isNaN(nik)) { showNotif("NIK harus 16 digit angka!", "error"); return false; }
+    
+    if (nik.length !== 16) { showNotif("NIK harus tepat 16 digit!", "error"); return false; }
+    if (no_hp.length < 10) { showNotif("Nomor WhatsApp tidak valid!", "error"); return false; }
     if (password.length < 8 || password.length > 16) { showNotif("Password harus antara 8-16 karakter!", "error"); return false; }
     return true;
 }
