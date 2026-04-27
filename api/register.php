@@ -1,66 +1,75 @@
-<?php 
-session_start(); 
-
-if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true')) {
-    $role = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
-    header("Location: " . ($role === 'admin' ? "admin_dashboard.php" : "dashboard.php"));
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login | RS Caruban</title>
+    <title>Register | RS Caruban</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#3b82f615 0.5px, #f0f9ff 0.5px) 0 0/30px 30px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#22c55e10 0.5px, #f0fdf4 0.5px) 0 0/20px 20px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
 <div class="flex justify-center items-center flex-grow p-4 md:p-6">
-    <div class="bg-white/95 backdrop-blur-xl border border-slate-100 p-8 md:p-12 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-blue-900/10 w-full max-w-md">
-        
-        <div class="text-center mb-8 md:mb-10">
-            <a href="../index.html" class="inline-flex p-3 md:p-4 bg-blue-50 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-inner hover:scale-105 transition-transform">
-                <img src="../RSCaruban.png" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
+    <div class="bg-white/90 backdrop-blur-md border border-slate-100 p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-green-900/5 w-full max-w-lg">
+
+        <div class="text-center mb-6 md:mb-8">
+            <a href="../index.html" class="inline-flex p-3 bg-green-50 rounded-2xl mb-4 hover:scale-105 transition-transform">
+                <img src="../RSCaruban.png" class="w-10 h-10 object-contain" alt="Logo">
             </a>
-            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
-            <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
+            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Buat Akun</h1>
+            <p class="text-slate-500 text-xs md:text-sm font-medium mt-2">Daftar untuk akses layanan digital</p>
         </div>
 
-        <div id="notif" class="hidden text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-full mb-6 border transition-all shadow-sm"></div>
+        <div id="notif" class="hidden text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-2xl mb-6 border transition-all"></div>
 
-        <form method="POST" action="proses_login.php" onsubmit="return validasiLogin()" class="space-y-4 md:space-y-5">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
-                <input type="email" name="email" id="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
+        <form method="POST" action="proses_register.php" onsubmit="return validasi()" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Alamat Email</label>
+                <input type="email" name="email" id="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">NIK (16 Digit)</label>
-                <input type="text" name="nik" id="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm text-slate-700">
+
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nama Lengkap</label>
+                <input type="text" name="nama" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
             </div>
-            
-            <div class="relative">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Kata Sandi</label>
-                <input type="password" name="password" id="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700 pr-12">
-                <button type="button" onclick="togglePassword()" class="absolute right-4 top-10 text-slate-400 hover:text-blue-600 transition-colors">
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">NIK</label>
+                <input type="text" name="nik" id="nik" required inputmode="numeric" placeholder="16 Digit" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-mono text-sm transition-all">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">WhatsApp</label>
+                <input type="tel" name="no_hp" required placeholder="0812..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Domisili</label>
+                <textarea name="alamat" required placeholder="Alamat lengkap..." rows="2" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium transition-all resize-none text-sm"></textarea>
+            </div>
+
+            <div class="md:col-span-2 relative">
+                <label class="block text-[10px] font-black text-green-600 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                <input type="password" name="password" id="password" required placeholder="Password 8-16 karakter" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-green-100 outline-none font-medium text-sm transition-all">
+                <button type="button" onclick="togglePassword()" class="absolute right-4 top-10 text-slate-400 hover:text-green-600">
                     <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                 </button>
             </div>
 
-            <button type="submit" class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
-                Masuk ke Sistem
+            <input type="hidden" name="role" value="user">
+
+            <button class="md:col-span-2 w-full bg-green-600 text-white p-5 mt-4 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-green-700 shadow-xl shadow-green-100 active:scale-95 transition-all">
+                Konfirmasi Pendaftaran
             </button>
         </form>
 
-        <div class="mt-8 md:mt-10 pt-6 border-t border-slate-50 text-center">
-            <p class="text-xs md:text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
+        <div class="mt-8 pt-6 border-t border-slate-50 text-center">
+            <p class="text-xs md:text-sm font-medium text-slate-500">Sudah punya akun? <a href="login.php" class="text-green-600 font-bold hover:underline">Login di sini</a></p>
         </div>
     </div>
 </div>
@@ -72,19 +81,18 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
 <script>
 function showNotif(pesan, tipe) {
     let notif = document.getElementById("notif");
-    // Rounded-full membuat bentuk kapsul oval sempurna sesuai gambar
-    notif.className = "text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-full mb-6 border transition-all " + 
-                     (tipe === "error" ? "bg-red-50 text-red-600 border-red-100" : "bg-blue-50 text-blue-600 border-blue-100");
+    notif.className = "text-center font-bold text-[10px] uppercase tracking-widest p-4 rounded-2xl mb-6 border transition-all " + 
+                     (tipe === "error" ? "bg-red-50 text-red-600 border-red-100" : "bg-green-50 text-green-600 border-green-100");
     notif.innerText = pesan;
     notif.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function validasiLogin() {
+function validasi() {
     let nik = document.getElementById("nik").value;
     let password = document.getElementById("password").value;
     if (nik.length !== 16 || isNaN(nik)) { showNotif("NIK harus 16 digit angka!", "error"); return false; }
-    if (password.length < 8) { showNotif("Password minimal 8 karakter!", "error"); return false; }
+    if (password.length < 8 || password.length > 16) { showNotif("Password harus antara 8-16 karakter!", "error"); return false; }
     return true;
 }
 
@@ -99,12 +107,6 @@ function togglePassword() {
         icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
     }
 }
-
-// Menangkap error dari PHP (proses_login.php) secara otomatis
-<?php if(isset($_SESSION['error'])): ?>
-    showNotif("<?php echo $_SESSION['error']; ?>", "error");
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
 </script>
 </body>
 </html>
