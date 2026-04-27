@@ -118,9 +118,9 @@ if (!$isLogin || $role !== 'user') {
 // Data Dokter per Poli
 const dataDokter = {
     "Poli Umum": ["Dr. Dante Sp.PD", "Dr. Vergil Sp.PD", "Dr. Nero Sp.PD"],
-    "Poli Gigi": ["Drg. Lady", "Drg. Trish", "Drg. Nico"],
-    "Poli Anak": ["Dr. V Sp.A", "Dr. Kyrie Sp.A", "Dr. Eva Sp.A"],
-    "Poli Jantung": ["Dr. Mundus Sp.JP", "Dr. Sparda Sp.JP", "Dr. Argosax Sp.JP"]
+    "Poli Gigi": ["Drg. Leon", "Drg. Chris", "Drg. Ethan"],
+    "Poli Anak": ["Dr. Joel Sp.A", "Dr. Ellie Sp.A", "Dr. Tommy Sp.A"],
+    "Poli Jantung": ["Dr. Morgana Sp.JP", "Dr. Koromaru Sp.JP", "Dr. Teddie Sp.JP"]
 };
 
 function updateDokter() {
