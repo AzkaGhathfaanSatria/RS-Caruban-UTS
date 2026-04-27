@@ -12,59 +12,60 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login | RS Caruban</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(#3b82f615 0.5px, #f0f9ff 0.5px) 0 0/30px 30px; }
+        html, body { overflow-x: hidden; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-<div class="flex justify-center items-center flex-grow p-6">
-    <div class="bg-white/90 backdrop-blur-xl border border-slate-100 p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-blue-900/10 w-full max-w-md">
+<div class="flex justify-center items-center flex-grow p-4 md:p-6">
+    <div class="bg-white/95 backdrop-blur-xl border border-slate-100 p-6 md:p-12 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-blue-900/10 w-full max-w-md">
         
-        <div class="text-center mb-10">
-            <div class="inline-flex p-4 bg-blue-50 rounded-3xl mb-6 shadow-inner">
-                <img src="RSCaruban.png" class="w-16 h-16 object-contain" alt="Logo">
+        <div class="text-center mb-8 md:mb-10">
+            <div class="inline-flex p-3 md:p-4 bg-blue-50 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-inner">
+                <img src="RSCaruban" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
             </div>
-            <h1 class="text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
-            <p class="text-slate-500 font-medium mt-2">Masuk untuk mengakses layanan</p>
+            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
+            <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
         </div>
 
         <?php if(isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center mb-6">
+            <div class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl md:rounded-2xl text-[10px] font-black uppercase tracking-widest text-center mb-6">
                 <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="proses_login.php" class="space-y-5">
+        <form method="POST" action="proses_login.php" class="space-y-4 md:space-y-5">
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
-                <input type="email" name="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium">
+                <input type="email" name="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">NIK (16 Digit)</label>
-                <input type="text" name="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm">
+                <input type="text" name="nik" required placeholder="Sesuai KTP" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Kata Sandi</label>
-                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium">
+                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-3.5 md:p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm">
             </div>
-            <button class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
+            <button type="submit" class="w-full bg-blue-600 text-white p-4 md:p-5 mt-2 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
                 Masuk ke Sistem
             </button>
         </form>
 
-        <div class="mt-10 pt-6 border-t border-slate-50 text-center">
-            <p class="text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
+        <div class="mt-8 md:mt-10 pt-6 border-t border-slate-50 text-center">
+            <p class="text-xs md:text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
         </div>
     </div>
 </div>
 
-<footer class="py-8 text-center bg-white/50 border-t border-slate-100">
-    <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">© 2026 RS CARUBAN</p>
+<footer class="py-6 md:py-8 text-center bg-white/50 border-t border-slate-100">
+    <p class="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">© 2026 RS CARUBAN</p>
 </footer>
 
 </body>
