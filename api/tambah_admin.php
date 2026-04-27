@@ -4,14 +4,12 @@ session_start();
 require_once 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// 1. SINKRONISASI SESSION & COOKIE
 if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
     $_SESSION['login'] = true;
     $_SESSION['role']  = $_COOKIE['user_role'];
     $_SESSION['email'] = $_COOKIE['user_email'];
 }
 
-// 2. CEK KEAMANAN: Harus Login & Harus Admin
 $role_check = $_SESSION['role'] ?? '';
 if (!isset($_SESSION['login']) || $role_check !== 'admin') {
     header("Location: login.php");

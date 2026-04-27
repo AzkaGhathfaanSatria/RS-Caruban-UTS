@@ -3,7 +3,6 @@ session_start();
 require_once 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// 1. Proteksi Login Hybrid
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
 $email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? '';
@@ -13,7 +12,6 @@ if (!$isLogin || $role !== 'user') {
     exit();
 }
 
-// 2. Ambil data riwayat berdasarkan email user
 $query = mysqli_query($conn, "SELECT * FROM pasien WHERE email='$email' ORDER BY id DESC");
 ?>
 <!DOCTYPE html>

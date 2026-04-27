@@ -23,7 +23,6 @@ if (!$isLogin || $role !== 'user') {
             background: radial-gradient(#3b82f605 0.5px, #f8fafc 0.5px) 0 0/24px 24px; 
             overflow-x: hidden;
         }
-        /* Menghilangkan panah default select di beberapa browser agar seragam */
         select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
     </style>
 </head>
@@ -115,7 +114,6 @@ if (!$isLogin || $role !== 'user') {
 </footer>
 
 <script>
-// Data Dokter per Poli
 const dataDokter = {
     "Poli Umum": ["Dr. Dante Sp.PD", "Dr. Vergil Sp.PD", "Dr. Nero Sp.PD"],
     "Poli Gigi": ["Drg. Leon", "Drg. Chris", "Drg. Ethan"],

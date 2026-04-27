@@ -3,7 +3,6 @@ session_start();
 include 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// --- PROTEKSI HYBRID (Cek Session + Cookie) ---
 if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
     $_SESSION['login'] = true;
     $_SESSION['role']  = $_COOKIE['user_role'];
@@ -14,7 +13,6 @@ $role_check = $_SESSION['role'] ?? '';
 if (!isset($_SESSION['login']) || $role_check !== 'admin') {
     die("Akses ditolak! Anda tidak memiliki izin mengubah role.");
 }
-// ----------------------------------------------
 
 $id = isset($_GET['id']) ? mysqli_real_escape_string($conn, $_GET['id']) : '';
 

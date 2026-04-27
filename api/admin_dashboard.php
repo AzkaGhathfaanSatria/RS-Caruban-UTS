@@ -4,21 +4,18 @@ session_start();
 include 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// Sinkronisasi Session & Cookie
 if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
     $_SESSION['login'] = true;
     $_SESSION['role']  = $_COOKIE['user_role'];
     $_SESSION['email'] = $_COOKIE['user_email'];
 }
 
-// Cek Keamanan
 $role_check = $_SESSION['role'] ?? '';
 if (!isset($_SESSION['login']) || $role_check !== 'admin') {
     header("Location: login.php");
     exit();
 }
 
-// Ambil data
 $data_user = mysqli_query($conn, "SELECT * FROM user ORDER BY role ASC");
 $users_array = [];
 $total_admin = 0;
@@ -125,7 +122,6 @@ $total_user = count($users_array);
             </table>
         </div>
         <div class="md:hidden text-center py-3 bg-slate-50 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-            ↔ Geser tabel untuk melihat detail
         </div>
     </div>
 </div>

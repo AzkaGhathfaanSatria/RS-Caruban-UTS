@@ -3,7 +3,6 @@ session_start();
 include 'koneksi.php';
 $conn = $koneksi ?? $conn;
 
-// --- PROTEKSI HYBRID (Cek Session + Cookie) ---
 if (!isset($_SESSION['login']) && isset($_COOKIE['user_login'])) {
     $_SESSION['login'] = true;
     $_SESSION['role']  = $_COOKIE['user_role'];
@@ -14,7 +13,6 @@ $role_check = $_SESSION['role'] ?? '';
 if (!isset($_SESSION['login']) || $role_check !== 'admin') {
     die("Akses ditolak! Sistem tidak mengenali status Admin Anda.");
 }
-// ----------------------------------------------
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama   = mysqli_real_escape_string($conn, $_POST['nama']);
@@ -25,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role   = 'admin';
 
-    // Cek Duplikat
     $cek = mysqli_query($conn, "SELECT id FROM user WHERE email='$email' OR nik='$nik'");
     if (mysqli_num_rows($cek) > 0) {
         echo "<script>alert('Error: Email atau NIK sudah digunakan!'); window.history.back();</script>";

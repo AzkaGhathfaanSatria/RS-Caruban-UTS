@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Pastikan file koneksi.php ada di satu folder yang sama atau sesuaikan path-nya
 require_once('koneksi.php');
 
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
@@ -17,6 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $no_hp  = mysqli_real_escape_string($conn, $_POST['no_hp']);
     $poli   = mysqli_real_escape_string($conn, $_POST['poli']);
     $dokter = mysqli_real_escape_string($conn, $_POST['dokter']);
+    
+    $nama_asli = $_SESSION['nama_akun'] ?? '';
+    $nik_asli  = $_SESSION['nik_akun'] ?? '';
+
+    if (strtolower($nama) !== strtolower($nama_asli) || $nik !== $nik_asli) {
+        echo "<script>alert('Nama atau NIK tidak sesuai dengan data akun Anda! Pastikan mengisi sesuai identitas saat registrasi.'); window.history.back();</script>";
+        exit();
+    }
 
     $query = "INSERT INTO pasien (email, nama, nik, no_hp, poli, dokter, tanggal)
               VALUES ('$email', '$nama', '$nik', '$no_hp', '$poli', '$dokter', NOW())";

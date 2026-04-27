@@ -1,5 +1,4 @@
 <?php
-// Tampilkan error untuk sementara agar kita tahu masalahnya
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -16,12 +15,10 @@ if (!$conn) {
 
 mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
 
-// TiDB Cloud butuh SSL. Di Vercel, kita gunakan default cert store.
 if (!mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL)) {
     die("Setting SSL failed");
 }
 
-// Hapus tanda @ agar kalau error langsung muncul pesannya
 $real_connect = mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL);
 
 if (!$real_connect) {

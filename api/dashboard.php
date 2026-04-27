@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// 1. Sinkronisasi & Proteksi Session/Cookie
 $isLogin = isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['user_login'] === 'true');
 $role    = $_SESSION['role'] ?? $_COOKIE['user_role'] ?? '';
 $email   = $_SESSION['email'] ?? $_COOKIE['user_email'] ?? 'User';
@@ -11,7 +10,6 @@ if (!$isLogin || $role !== 'user') {
     exit();
 }
 
-// 2. Fetch Data BPS (Optimized Hybrid)
 $url = "https://webapi.bps.go.id/v1/api/interoperabilitas/datasource/simdasi/id/25/tahun/2025/id_tabel/a05CZmFhT0JWY0lBd2g0cW80S0xiZz09/wilayah/0000000/key/70058463cbf1a93d3592aea3ebbf1339";
 $res = false;
 
@@ -54,7 +52,6 @@ if (isset($data_bps['data'][1])) {
         body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        /* Animasi halus untuk tabel */
         .table-container { position: relative; }
         .table-container::after {
             content: "Geser Horizontal ↔";
