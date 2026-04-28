@@ -28,6 +28,7 @@ while ($row = mysqli_fetch_assoc($data_user)) {
 }
 $total_user = count($users_array);
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -38,7 +39,6 @@ $total_user = count($users_array);
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
-        /* Custom Scrollbar untuk Tabel */
         .custom-scroll::-webkit-scrollbar { height: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
@@ -61,7 +61,7 @@ $total_user = count($users_array);
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
         <?php 
         $stats = [
-            ['Total User', $total_user, 'blue', '👥'],
+            ['Total User', $total_user, 'yellow', '👥'],
             ['User Biasa', $total_user_biasa, 'emerald', '👤'],
             ['Admin', $total_admin, 'rose', '🛡️']
         ];
