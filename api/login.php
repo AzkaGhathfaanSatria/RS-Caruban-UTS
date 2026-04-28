@@ -29,13 +29,13 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
             <a href="../index.html" class="inline-flex p-3 md:p-4 bg-blue-50 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-inner hover:scale-105 transition-transform">
                 <img src="../RSCaruban.png" class="w-12 h-12 md:w-16 md:h-16 object-contain" alt="Logo">
             </a>
-            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">Selamat Datang</h1>
+            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight italic">Selamat Datang</h1>
             <p class="text-slate-500 font-medium mt-2 text-sm md:text-base">Masuk untuk mengakses layanan</p>
         </div>
 
         <form method="POST" action="proses_login.php" class="space-y-4 md:space-y-5">
             <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Registrasi</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-blue-600">Email Registrasi</label>
                 <input type="email" name="email" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700">
             </div>
 
@@ -46,7 +46,7 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
 
             <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">NIK (16 Digit)</label>
-                <input type="text" name="nik" required placeholder="16 digit NIK Anda" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm text-slate-700">
+                <input type="text" name="nik" required maxlength="16" minlength="16" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="16 digit NIK Anda" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-mono text-sm text-slate-700">
             </div>
             
             <div class="relative">
@@ -54,7 +54,7 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
                 <div class="relative">
                     <input type="password" name="password" id="password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl md:rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all outline-none font-medium text-sm text-slate-700 pr-12">
                     
-                    <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors">
+                    <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-blue-600 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" id="eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7" />
                         </svg>
@@ -62,13 +62,13 @@ if (isset($_SESSION['login']) || (isset($_COOKIE['user_login']) && $_COOKIE['use
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
+            <button type="submit" class="w-full bg-blue-600 text-white p-5 mt-2 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all">
                 Masuk ke Sistem
             </button>
         </form>
 
         <div class="mt-8 md:mt-10 pt-6 border-t border-slate-50 text-center">
-            <p class="text-xs md:text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
+            <p class="text-xs md:text-sm font-medium text-slate-500">Belum punya akun? <a href="register.php" class="text-blue-600 font-bold hover:underline italic">Daftar Sekarang</a></p>
         </div>
     </div>
 </div>

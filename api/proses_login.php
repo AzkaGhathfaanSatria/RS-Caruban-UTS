@@ -10,6 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nik   = mysqli_real_escape_string($db, trim($_POST['nik']));
     $password = $_POST['password'];
 
+    if (!ctype_digit($nik) || strlen($nik) !== 16) {
+        echo "<script>alert('NIK HARUS 16 DIGIT ANGKA!'); window.location.href='login.php';</script>";
+        exit();
+    }
+
     $sql = "SELECT * FROM user WHERE email='$email' AND nama='$nama' AND nik='$nik' LIMIT 1";
     $query = mysqli_query($db, $sql);
 
